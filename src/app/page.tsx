@@ -92,7 +92,7 @@ export default function Home() {
             {/* Stats Grid */}
             <div className="grid grid-cols-3 gap-2 text-sm mb-4">
               <p>
-                🧬 Tribe: <b>{char.tribe}</b>
+                🧬 Race: <b>{char.race}</b>
               </p>
               <p>
                 ⚔️ Class: <b>{char.class}</b>
@@ -101,7 +101,7 @@ export default function Home() {
                 ❤️ HP: <b className="text-red-400">{char.status.hp}</b>
               </p>
               <p>
-                🛡️ DEF: <b>{char.status.def}</b>
+                🛡️ DEF: <b>{char.status.def}+</b>
               </p>
               <p>
                 🏃 Move: <b>{char.status.move}</b>
@@ -117,8 +117,8 @@ export default function Home() {
                 Basic Attack
               </p>
               <div className="flex justify-between text-sm">
-                <span>🎯 Hit: {char.status.attack.hitOn}</span>
-                <span>📏 Range: {char.status.attack.range}</span>
+                <span>🎯 Hit: {char.status.attack.hitOn}+</span>
+                <span>📏 Range: {char.status.attack.range}"</span>
                 <span className="text-orange-400">
                   💥 DMG: {char.status.attack.damage}
                 </span>

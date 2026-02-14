@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import characterData from "@/data/character.json";
+import statusBuffs from "@/data/statusBuff.json";
 import { Character } from "@/interface/character";
 import { useTeam } from "@/context/TeamContext";
 import React from "react";
@@ -22,6 +23,11 @@ export default function TeamsPage() {
     endTurn,
     resetTurn,
     notifications,
+    characterStatBoost,
+    applyStatBoost,
+    activeStatusBuffs,
+    addStatusBuff,
+    removeStatusBuff,
   } = useTeam();
   const [attackerId, setAttackerId] = React.useState<number | null>(null);
   const [defenderId, setDefenderId] = React.useState<number | null>(null);
@@ -43,9 +49,50 @@ export default function TeamsPage() {
     currentHp: number;
   } | null>(null);
   const [hpAdjustValue, setHpAdjustValue] = React.useState(0);
+  const [meleeBonus, setMeleeBonus] = React.useState(false);
+  const [lightCover, setLightCover] = React.useState(false);
+  const [statBoostModal, setStatBoostModal] = React.useState<{
+    characterId: number;
+    characterName: string;
+    race: string;
+  } | null>(null);
+  const [statusModal, setStatusModal] = React.useState<{
+    characterId: number;
+    characterName: string;
+  } | null>(null);
 
   const getCharacterById = (id: number) =>
     characters.find((char) => char.id === id);
+
+  const getStatBoostByType = (
+    characterId: number,
+    statType: string,
+  ): number => {
+    const boost = characterStatBoost[characterId];
+    const character = getCharacterById(characterId);
+    if (!character) return 0;
+
+    if (boost === "move" && statType === "move") return 1;
+    if (boost === "hp" && statType === "hp") return 2;
+    if (boost === "def" && statType === "def") return -1;
+    if (boost === "hiton" && statType === "hiton") return -1;
+    return 0;
+  };
+
+  const getDisplayStat = (characterId: number, statType: string): number => {
+    const character = getCharacterById(characterId);
+    if (!character) return 0;
+
+    let baseStat = 0;
+    if (statType === "hiton") {
+      baseStat = character.status.attack.hitOn ?? 0;
+    } else if (statType === "move" || statType === "def" || statType === "hp") {
+      baseStat = character.status[statType] as number;
+    }
+
+    const boost = getStatBoostByType(characterId, statType);
+    return baseStat + boost;
+  };
 
   const renderTeam = (
     teamIds: number[],
@@ -95,11 +142,15 @@ export default function TeamsPage() {
                       src={char.avatar}
                       width={60}
                       height={60}
-                      className="rounded-lg"
+                      className={`rounded-lg ${isDead ? "grayscale" : ""}`}
                     />
                     <div>
-                      <h3 className="text-xl font-bold text-amber-400">
-                        {char.name}
+                      <h3 className="text-xl text-amber-400">
+                        <span
+                          className={isDead ? "line-through text-red-500" : ""}
+                        >
+                          {char.name}
+                        </span>
                       </h3>
                       <p className="text-sm text-gray-300">{char.role}</p>
                       <div className="mt-2 flex gap-2">
@@ -120,8 +171,8 @@ export default function TeamsPage() {
                   {/* Stats */}
                   <div className="grid grid-cols-2 gap-2 text-sm mb-3">
                     <div>
-                      <p className="text-gray-400">Tribe</p>
-                      <p className="font-semibold">{char.tribe}</p>
+                      <p className="text-gray-400">Race</p>
+                      <p className="font-semibold">{char.race}</p>
                     </div>
                     <div>
                       <p className="text-gray-400">Class</p>
@@ -130,7 +181,10 @@ export default function TeamsPage() {
                     <div>
                       <p className="text-gray-400">HP</p>
                       <p className="font-semibold text-red-400">
-                        {currentHp?.[char.id] ?? char.status.hp}
+                        {(currentHp?.[char.id] ?? char.status.hp) + getStatBoostByType(char.id, "hp")}
+                        {characterStatBoost[char.id] === "hp" && (
+                          <span className="text-purple-400 ml-1">(+2)</span>
+                        )}
                       </p>
                     </div>
                     <div>
@@ -141,16 +195,26 @@ export default function TeamsPage() {
                     </div>
                     <div>
                       <p className="text-gray-400">DEF</p>
-                      <p className="font-semibold">{char.status.def}</p>
+                      <p className="font-semibold">
+                        {getDisplayStat(char.id, "def")}
+                        {characterStatBoost[char.id] === "def" && (
+                          <span className="text-purple-400 ml-1">(-1)</span>
+                        )}
+                      </p>
                     </div>
                     <div>
                       <p className="text-gray-400">Move</p>
-                      <p className="font-semibold">{char.status.move}</p>
+                      <p className="font-semibold">
+                        {getDisplayStat(char.id, "move")}
+                        {characterStatBoost[char.id] === "move" && (
+                          <span className="text-purple-400 ml-1">(+1)</span>
+                        )}
+                      </p>
                     </div>
-                    <div>
-                      <p className="text-gray-400">AP</p>
+                    {/* <div>
+                      <p className="text-gray-400">Base AP</p>
                       <p className="font-semibold">{char.status.ap}</p>
-                    </div>
+                    </div> */}
                   </div>
 
                   {/* Attack */}
@@ -159,13 +223,46 @@ export default function TeamsPage() {
                       Basic Attack
                     </p>
                     <div className="space-y-1">
-                      <p>🎯 {char.status.attack.hitOn}</p>
-                      <p>📏 Range: {char.status.attack.range}</p>
+                      <p>
+                        <span>🎯 {getDisplayStat(char.id, "hiton")}+</span>
+                        {characterStatBoost[char.id] === "hiton" && (
+                          <span className="text-purple-400 ml-1">(-1)</span>
+                        )}
+                      </p>
+                      <p>📏 Range: {char.status.attack.range}"</p>
                       <p className="text-orange-400">
                         💥 DMG: {char.status.attack.damage}
                       </p>
                     </div>
                   </div>
+
+                  {/* Active Statuses */}
+                  {((activeStatusBuffs?.[char.id] ?? []) as number[]).length > 0 && (
+                    <div className="mt-3 mb-3">
+                      <p className="text-xs text-gray-400 mb-1">Status</p>
+                      <div className="flex gap-2 flex-wrap">
+                        {(activeStatusBuffs[char.id] ?? []).map((bid) => {
+                          const b = (statusBuffs as any[]).find((s) => s.id === bid);
+                          return (
+                            <span
+                              key={bid}
+                              title={b.description}
+                              className="bg-gray-700 text-sm px-2 py-1 rounded flex items-center gap-2"
+                            >
+                              <span>{b?.thaiName ?? `#${bid}`}</span>
+                              <button
+                                onClick={() => removeStatusBuff(char.id, bid)}
+                                className="text-xs text-red-400 hover:text-red-200"
+                                aria-label="remove-status"
+                              >
+                                ✕
+                              </button>
+                            </span>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
 
                   {/* Buttons */}
                   <div className="flex gap-2 flex-wrap">
@@ -194,10 +291,43 @@ export default function TeamsPage() {
                         aria-expanded={openMenuId === char.id}
                       >
                         ⋯
+                        {char.race === "Human" &&
+                          !characterStatBoost[char.id] && (
+                            <span className="absolute w-3 h-3 rounded-full bg-red-600 -top-1 -right-1" />
+                          )}
                       </button>
 
                       {openMenuId === char.id && (
                         <div className="absolute right-0 mt-2 w-44 bg-gray-800 border border-gray-600 rounded shadow-lg z-50">
+                          {char.race === "Human" &&
+                            !characterStatBoost[char.id] && (
+                              <button
+                                onClick={() => {
+                                  setOpenMenuId(null);
+                                  setStatBoostModal({
+                                    characterId: char.id,
+                                    characterName: char.name,
+                                    race: char.race,
+                                  });
+                                }}
+                                className="w-full text-left px-4 py-2 hover:bg-gray-700 text-purple-400 font-semibold"
+                              >
+                                ⭐ เพิ่ม Stat
+                              </button>
+                            )}
+
+                          <button
+                            onClick={() => {
+                              setOpenMenuId(null);
+                              setStatusModal({
+                                characterId: char.id,
+                                characterName: char.name,
+                              });
+                            }}
+                            className="w-full text-left px-4 py-2 hover:bg-gray-700"
+                          >
+                            ➕ เติมสถานะ
+                          </button>
                           <button
                             onClick={() => {
                               setOpenMenuId(null);
@@ -205,7 +335,7 @@ export default function TeamsPage() {
                             }}
                             className="w-full text-left px-4 py-2 hover:bg-gray-700"
                           >
-                            รีเซท HP
+                            🔄 รีเซท HP
                           </button>
                           <button
                             onClick={() => {
@@ -213,13 +343,14 @@ export default function TeamsPage() {
                               setHpAdjustModal({
                                 characterId: char.id,
                                 characterName: char.name,
-                                currentHp: currentHp?.[char.id] ?? char.status.hp,
+                                currentHp:
+                                  currentHp?.[char.id] ?? char.status.hp,
                               });
                               setHpAdjustValue(0);
                             }}
                             className="w-full text-left px-4 py-2 hover:bg-gray-700"
                           >
-                            ปรับ HP
+                            ⚙️ ปรับ HP
                           </button>
                           <button
                             onClick={() => {
@@ -230,7 +361,7 @@ export default function TeamsPage() {
                                 team: teamName as "A" | "B",
                               });
                             }}
-                            className="w-full text-left px-4 py-2 hover:bg-gray-700"
+                            className="w-full text-left px-4 py-2 text-red-500 hover:bg-gray-700"
                           >
                             ลบ
                           </button>
@@ -496,7 +627,7 @@ export default function TeamsPage() {
         </div>
       )}
 
-      {/* Action Panel (bottom-right) */}
+      {/* Action Panel (bottom-left) */}
       {actionPanelVisible && (
         <div className="fixed left-4 bottom-4 z-50">
           <div className="bg-gray-800 border border-amber-500 rounded-lg p-4 w-80 shadow-xl">
@@ -507,6 +638,8 @@ export default function TeamsPage() {
                   setActionPanelVisible(false);
                   setAttackerId(null);
                   setDefenderId(null);
+                  setMeleeBonus(false);
+                  setLightCover(false);
                 }}
                 className="text-white bg-gray-700 hover:bg-gray-600 rounded px-2 py-1"
               >
@@ -514,18 +647,67 @@ export default function TeamsPage() {
               </button>
             </div>
             <div className="text-sm text-gray-200 mb-3">
-              <div>
-                ผู้โจมตี:{" "}
-                <b className="text-amber-300">
-                  {attackerId ? getCharacterById(attackerId)?.name : "-"}
-                </b>
+              <div className="flex justify-between items-center">
+                <div>
+                  ผู้โจมตี:{" "}
+                  <b className="text-amber-300">
+                    {attackerId ? getCharacterById(attackerId)?.name : "-"}
+                  </b>
+                </div>
+                {attackerId && (
+                  <div className="text-xs text-gray-400">
+                    Hit:{" "}
+                    <span className="text-green-500 text-xl">
+                      {(getCharacterById(attackerId)?.status.attack.hitOn ??
+                        0) + (meleeBonus ? 4 : 0)}
+                      +
+                    </span>
+                  </div>
+                )}
               </div>
-              <div>
-                ผู้ป้องกัน:{" "}
-                <b className="text-amber-300">
-                  {defenderId ? getCharacterById(defenderId)?.name : "-"}
-                </b>
+              <div className="mt-2 flex justify-between items-center">
+                <div>
+                  ผู้ป้องกัน:{" "}
+                  <b className="text-amber-300">
+                    {defenderId ? getCharacterById(defenderId)?.name : "-"}
+                  </b>
+                </div>
+                {defenderId && (
+                  <div className="text-xs text-gray-400">
+                    Def:{" "}
+                    <span className="text-blue-500 text-xl">
+                      {(getCharacterById(defenderId)?.status.def ?? 0) +
+                        (lightCover ? 2 : 0)}
+                    </span>
+                  </div>
+                )}
               </div>
+            </div>
+            <div className="grid grid-cols-3 gap-2 mb-3">
+              {attackerId &&
+                (getCharacterById(attackerId)?.status.attack.range ?? 0) >
+                  1 && (
+                  <button
+                    onClick={() => setMeleeBonus(!meleeBonus)}
+                    className={`w-full px-2 py-1 rounded font-semibold transition text-xs ${
+                      meleeBonus
+                        ? "bg-gray-600 hover:bg-gray-700 text-white"
+                        : " border border-gray-600 hover:bg-gray-700 text-white"
+                    }`}
+                  >
+                    {meleeBonus ? "๏ Melee +4" : "Melee (+4)"}
+                  </button>
+                )}
+              <button
+                onClick={() => setLightCover(!lightCover)}
+                className={`w-full px-2 py-1 rounded font-semibold transition text-xs ${
+                  lightCover
+                    ? "bg-gray-600 hover:bg-gray-700 text-white"
+                    : " border border-gray-600 hover:bg-gray-700 text-white"
+                }`}
+              >
+                {lightCover ? "๏ Covered" : "Cover"}
+              </button>
             </div>
             <div className="flex gap-2">
               <button
@@ -545,7 +727,11 @@ export default function TeamsPage() {
                     defenderId as number,
                     true,
                   );
-                  setTimeout(() => setIsAttacking(false), 3000);
+                  setTimeout(() => {
+                    setIsAttacking(false);
+                    setMeleeBonus(false);
+                    setLightCover(false);
+                  }, 3000);
                 }}
                 className="flex-1 bg-red-600 hover:bg-red-700 disabled:bg-red-900 disabled:opacity-50 text-white px-3 py-2 rounded transition"
               >
@@ -568,7 +754,11 @@ export default function TeamsPage() {
                     defenderId as number,
                     false,
                   );
-                  setTimeout(() => setIsAttacking(false), 3000);
+                  setTimeout(() => {
+                    setIsAttacking(false);
+                    setMeleeBonus(false);
+                    setLightCover(false);
+                  }, 3000);
                 }}
                 className="flex-1 bg-gray-600 hover:bg-gray-700 disabled:bg-gray-800 disabled:opacity-50 text-white px-3 py-2 rounded transition"
               >
@@ -583,21 +773,28 @@ export default function TeamsPage() {
       {hpAdjustModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
           <div className="bg-gray-800 border-2 border-yellow-500 rounded-lg p-6 max-w-sm w-full shadow-xl">
-            <h2 className="text-2xl font-bold text-yellow-400 mb-4">
-              ปรับ HP
-            </h2>
+            <h2 className="text-2xl font-bold text-yellow-400 mb-4">ปรับ HP</h2>
             <p className="text-gray-300 mb-4">
-              <span className="font-bold text-amber-400">{hpAdjustModal.characterName}</span>
+              <span className="font-bold text-amber-400">
+                {hpAdjustModal.characterName}
+              </span>
               <br />
-              เลือดปัจจุบัน: <span className="text-red-400 font-bold">{hpAdjustModal.currentHp}</span>
+              เลือดปัจจุบัน:{" "}
+              <span className="text-red-400 font-bold">
+                {hpAdjustModal.currentHp}
+              </span>
             </p>
-            
+
             <div className="mb-4">
-              <label className="text-sm text-gray-300 block mb-2">เพิ่ม/ลดเลือด:</label>
+              <label className="text-sm text-gray-300 block mb-2">
+                เพิ่ม/ลดเลือด:
+              </label>
               <input
                 type="number"
                 value={hpAdjustValue}
-                onChange={(e) => setHpAdjustValue(parseInt(e.target.value) || 0)}
+                onChange={(e) =>
+                  setHpAdjustValue(parseInt(e.target.value) || 0)
+                }
                 className="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white text-center"
               />
             </div>
@@ -618,7 +815,10 @@ export default function TeamsPage() {
             </div>
 
             <p className="text-sm text-gray-400 mb-4 text-center">
-              เลือดสุดท้าย: <span className="font-bold text-white">{Math.max(0, hpAdjustModal.currentHp + hpAdjustValue)}</span>
+              เลือดสุดท้าย:{" "}
+              <span className="font-bold text-white">
+                {Math.max(0, hpAdjustModal.currentHp + hpAdjustValue)}
+              </span>
             </p>
 
             <div className="flex gap-4">
@@ -631,7 +831,10 @@ export default function TeamsPage() {
               <button
                 onClick={() => {
                   if (hpAdjustModal) {
-                    const newHp = Math.max(0, hpAdjustModal.currentHp + hpAdjustValue);
+                    const newHp = Math.max(
+                      0,
+                      hpAdjustModal.currentHp + hpAdjustValue,
+                    );
                     adjustHpManual(hpAdjustModal.characterId, newHp);
                   }
                   setHpAdjustModal(null);
@@ -678,6 +881,109 @@ export default function TeamsPage() {
                 ลบ
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Stat Boost Modal */}
+      {statBoostModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-gray-800 border-2 border-purple-500 rounded-lg p-6 max-w-sm w-full shadow-xl">
+            <h2 className="text-2xl font-bold text-purple-400 mb-4">
+              ⭐ เพิ่ม Stat
+            </h2>
+            <p className="text-gray-300 mb-6">
+              เลือก Stat ที่ต้องการเพิ่มให้{" "}
+              <span className="font-bold text-amber-400">
+                {statBoostModal.characterName}
+              </span>
+            </p>
+
+            <div className="space-y-3 mb-6">
+              <button
+                onClick={() => {
+                  applyStatBoost(statBoostModal.characterId, "move");
+                  setStatBoostModal(null);
+                }}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded font-semibold transition text-left"
+              >
+                <div className="font-bold">Move +1</div>
+                <div className="text-xs text-gray-300">ความเร็วเพิ่มขึ้น 1</div>
+              </button>
+
+              <button
+                onClick={() => {
+                  applyStatBoost(statBoostModal.characterId, "hp");
+                  setStatBoostModal(null);
+                }}
+                className="w-full bg-red-600 hover:bg-red-700 text-white px-4 py-3 rounded font-semibold transition text-left"
+              >
+                <div className="font-bold">HP +2</div>
+                <div className="text-xs text-gray-300">เลือดเพิ่มขึ้น 2</div>
+              </button>
+
+              <button
+                onClick={() => {
+                  applyStatBoost(statBoostModal.characterId, "def");
+                  setStatBoostModal(null);
+                }}
+                className="w-full bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-3 rounded font-semibold transition text-left"
+              >
+                <div className="font-bold">Def -1</div>
+                <div className="text-xs text-gray-300">ป้องกันลดลง 1</div>
+              </button>
+
+              <button
+                onClick={() => {
+                  applyStatBoost(statBoostModal.characterId, "hiton");
+                  setStatBoostModal(null);
+                }}
+                className="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded font-semibold transition text-left"
+              >
+                <div className="font-bold">Hit On -1</div>
+                <div className="text-xs text-gray-300">แม่นยำลดลง 1</div>
+              </button>
+            </div>
+
+            <button
+              onClick={() => setStatBoostModal(null)}
+              className="w-full bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded font-semibold transition"
+            >
+              ยกเลิก
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Status Buff Modal */}
+      {statusModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-gray-800 border-2 border-purple-500 rounded-lg p-6 max-w-lg w-full shadow-xl">
+            <h2 className="text-2xl font-bold text-purple-400 mb-4">เลือกสถานะให้ {statusModal.characterName}</h2>
+            <p className="text-gray-300 mb-4">เลือก action / buff / debuff จากรายการ</p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6 max-h-80 overflow-auto">
+              {(statusBuffs as any[]).map((s) => (
+                <button
+                  key={s.id}
+                  onClick={() => {
+                    addStatusBuff(statusModal.characterId, s.id);
+                    setStatusModal(null);
+                  }}
+                  className="w-full text-left bg-gray-700 hover:bg-gray-600 px-4 py-3 rounded transition"
+                >
+                  <div className="font-bold text-white">{s.thaiName} <span className="text-xs text-gray-300">({s.engName})</span></div>
+                  <div className="text-xs text-gray-400">{s.description}</div>
+                </button>
+              ))}
+            </div>
+
+            <button
+              onClick={() => setStatusModal(null)}
+              className="w-full bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded font-semibold transition"
+            >
+              ยกเลิก
+            </button>
           </div>
         </div>
       )}

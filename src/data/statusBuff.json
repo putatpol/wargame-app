@@ -1,7 +1,135 @@
 [
-    {
-        "name": "guard",
-        "effect": "def",
-        "value": -2
-    }
+  {
+    "id": 1,
+    "engName": "guard",
+    "thaiName": "ป้องกัน",
+    "stat": "action",
+    "description": "ตั้งการ์ดป้องกัน def -1"
+  },
+  {
+    "id": 2,
+    "engName": "overwatch",
+    "thaiName": "ตอบโต้",
+    "stat": "action",
+    "description": "ตั้งการ์ดยิงตอบโต้"
+  },
+  {
+    "id": 3,
+    "engName": "aid",
+    "thaiName": "ช่วยเหลือ",
+    "stat": "action",
+    "description": "ได้รับการช่วยเหลือจากเพื่อน on hit -1"
+  },
+  {
+    "id": 4,
+    "engName": "rest",
+    "thaiName": "พักผ่อน",
+    "stat": "action",
+    "description": "พักผ่อนฟื้นฟูพลัง hp +3"
+  },
+  {
+    "id": 5,
+    "engName": "hide",
+    "thaiName": "ซ่อนตัว",
+    "stat": "action",
+    "description": "หลบการโจมตีใน cover"
+  },
+  {
+    "id": 6,
+    "engName": "prone",
+    "thaiName": "ล้ม",
+    "stat": "debuff",
+    "description": "ถูกผลักล้มลงพื้น ต้องใช้ 1ap ลุกขึ้น"
+  },
+  {
+    "id": 7,
+    "engName": "anchored",
+    "thaiName": "ถูกล่าม",
+    "stat": "debuff",
+    "description": "เคลื่อนที่ไม่ได้ แต่ทำ action ได้"
+  },
+  {
+    "id": 8,
+    "engName": "fractured",
+    "thaiName": "เกราะแตก",
+    "stat": "debuff",
+    "description": "ค่า def ลดลง 3"
+  },
+  {
+    "id": 9,
+    "engName": "burn",
+    "thaiName": "ถูกเผา",
+    "stat": "debuff",
+    "description": "Hp-2 ในเทิร์นถัดไป"
+  },
+  {
+    "id": 10,
+    "engName": "Disoriented",
+    "thaiName": "มึนงง",
+    "stat": "debuff",
+    "description": "ap -1 ห้ามใช้: Guard, Aid"
+  },
+  {
+    "id": 11,
+    "engName": "blind",
+    "thaiName": "ตาบอด",
+    "stat": "debuff",
+    "description": "onHit -2 ห้ามใช้: Overwatch, Aid"
+  },
+  {
+    "id": 12,
+    "engName": "frozen",
+    "thaiName": "แช่แข็ง",
+    "stat": "debuff",
+    "description": "ไม่สามารถทำ action ได้"
+  },
+  {
+    "id": 13,
+    "engName": "bleeding",
+    "thaiName": "เลือดไหล",
+    "stat": "debuff",
+    "description": "Hp-2 ทุกครั้งที่เคลื่อนที่"
+  },
+  {
+    "id": 14,
+    "engName": "silenced",
+    "thaiName": "ใบ้",
+    "stat": "debuff",
+    "description": "ไม่สามารถใช้ skill ได้"
+  },
+  {
+    "id": 15,
+    "engName": "dragon shield",
+    "thaiName": "โล่มังกร",
+    "stat": "buff",
+    "description": "ได้รับ def -1 หากโดนโจมตีจะสะท้อน 2 damage"
+  },
+  {
+    "id": 16,
+    "engName": "Devine light Shield",
+    "thaiName": "โล่แห่งแสง",
+    "stat": "buff",
+    "description": "ป้องกัน 2 damage"
+  },
+  {
+    "id": 17,
+    "engName": "Shield of TP",
+    "thaiName": "โล่แห่งพลังวาป",
+    "stat": "buff",
+    "description": "ได้รับ def -1 จากการใช้ teleport"
+  },
+  {
+    "id": 18,
+    "engName": "Melody of Valor",
+    "thaiName": "เพลงแห่งความกล้า",
+    "stat": "buff",
+    "description": "Hit -3▲ / M +2▲"
+  },
+  {
+    "id": 19,
+    "engName": "Melody of Discord",
+    "thaiName": "เพลงแห่งความสับสน",
+    "stat": "debuff",
+    "description": "Hit +3▼ / M - 2▼"
+  }
 ]

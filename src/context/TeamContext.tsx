@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState } from "react";
 import characterData from "@/data/character.json";
+import statusBuffData from "@/data/statusBuff.json";
 import { Character } from "@/interface/character";
 
 export interface Notification {
@@ -38,6 +39,11 @@ interface TeamContextType {
   endTurn: () => void;
   resetTurn: () => void;
   turnNumber: number;
+  characterStatBoost: { [characterId: number]: "move" | "hp" | "def" | "hiton" | null };
+  applyStatBoost: (characterId: number, stat: "move" | "hp" | "def" | "hiton") => void;
+  activeStatusBuffs: { [characterId: number]: number[] };
+  addStatusBuff: (characterId: number, buffId: number) => void;
+  removeStatusBuff: (characterId: number, buffId: number) => void;
 }
 
 const TeamContext = createContext<TeamContextType | undefined>(undefined);
@@ -66,6 +72,12 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
     () => ({ ...initialApMap }),
   );
   const [turnNumber, setTurnNumber] = useState<number>(1);
+  const [characterStatBoost, setCharacterStatBoost] = useState<{
+    [characterId: number]: "move" | "hp" | "def" | "hiton" | null;
+  }>({});
+  const [activeStatusBuffs, setActiveStatusBuffs] = useState<{
+    [characterId: number]: number[];
+  }>({});
 
   const addNotification = (
     message: string,
@@ -261,9 +273,21 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
       setTeamB((prev) => prev.filter((id) => id !== characterId));
     }
 
+
     setSelectedTeamByCharacter((prev) => ({
       ...prev,
       [characterId]: null,
+    }));
+
+    // รีเซท stat boost และ status buffs เมื่อลบตัวละครออกจากทีม
+    setCharacterStatBoost((prev) => ({
+      ...prev,
+      [characterId]: null,
+    }));
+
+    setActiveStatusBuffs((prev) => ({
+      ...prev,
+      [characterId]: [],
     }));
 
     addNotification(`❌ ลบ ${characterName} ออกจากทีม ${team}`, "info");
@@ -330,6 +354,85 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
     setSelectedTeamByCharacter({});
     setCurrentHp({ ...initialHpMap });
     addNotification("🔄 รีเซททั้งหมด", "info");
+    setCharacterStatBoost({});
+    setActiveStatusBuffs({});
+  };
+
+  const applyStatBoost = (characterId: number, stat: "move" | "hp" | "def" | "hiton") => {
+    const character = (characterData as Character[]).find(
+      (c) => c.id === characterId,
+    );
+    const characterName = character?.name || `#${characterId}`;
+
+    // ตรวจสอบว่าได้เพิ่ม stat ไปแล้วหรือไม่
+    if (characterStatBoost[characterId] !== null && characterStatBoost[characterId] !== undefined) {
+      addNotification(
+        `${characterName} ได้เพิ่ม stat ไปแล้ว ไม่สามารถเปลี่ยนได้`,
+        "error",
+      );
+      return;
+    }
+
+    // เพิ่ม stat boost
+    setCharacterStatBoost((prev) => ({
+      ...prev,
+      [characterId]: stat,
+    }));
+
+    const statLabels: { [key: string]: string } = {
+      move: "Move +1",
+      hp: "HP +2",
+      def: "Def -1",
+      hiton: "Hit On -1",
+    };
+
+    addNotification(
+      `⭐ ${characterName} ได้เพิ่ม ${statLabels[stat]}`,
+      "success",
+    );
+  };
+
+  const addStatusBuff = (characterId: number, buffId: number) => {
+    const characters = characterData as Character[];
+    const character = characters.find((c) => c.id === characterId);
+    const characterName = character?.name || `#${characterId}`;
+
+    const buff = (statusBuffData as any[]).find((b) => b.id === buffId);
+    if (!buff) {
+      addNotification(`ไม่พบ status id ${buffId}`, "error");
+      return;
+    }
+    const existing = activeStatusBuffs[characterId] ?? [];
+    if (existing.includes(buffId)) {
+      addNotification(`${characterName} มีสถานะ ${buff.thaiName} อยู่แล้ว`, "info");
+      return;
+    }
+
+    setActiveStatusBuffs((prev) => ({
+      ...prev,
+      [characterId]: [...(prev[characterId] ?? []), buffId],
+    }));
+
+    addNotification(`✨ ${characterName} ได้รับ ${buff.thaiName}`, "success");
+  };
+
+  const removeStatusBuff = (characterId: number, buffId: number) => {
+    const characters = characterData as Character[];
+    const character = characters.find((c) => c.id === characterId);
+    const characterName = character?.name || `#${characterId}`;
+    const buff = (statusBuffData as any[]).find((b) => b.id === buffId);
+    const existing = activeStatusBuffs[characterId] ?? [];
+    if (!existing.includes(buffId)) {
+      // nothing to remove
+      return;
+    }
+
+    setActiveStatusBuffs((prev) => ({
+      ...prev,
+      [characterId]: (prev[characterId] ?? []).filter((id) => id !== buffId),
+    }));
+
+    addNotification(`🗑️ ลบสถานะ ${buff?.thaiName ?? buffId} จาก ${characterName}`, "info");
   };
 
   return (
@@ -354,6 +457,11 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
         endTurn,
         resetTurn,
         turnNumber,
+        characterStatBoost,
+        applyStatBoost,
+        activeStatusBuffs,
+        addStatusBuff,
+        removeStatusBuff,
       }}
     >
       {children}
