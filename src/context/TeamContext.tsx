@@ -21,13 +21,22 @@ interface TeamContextType {
   addRandomCharacters: (count: number, team: "A" | "B") => void;
   resetTeams: () => void;
   notifications: Notification[];
-  addNotification: (message: string, type: "success" | "info" | "error") => void;
+  addNotification: (
+    message: string,
+    type: "success" | "info" | "error",
+  ) => void;
   currentHp: { [characterId: number]: number };
   applyDamage: (characterId: number, damage: number) => void;
   resetHp: (characterId: number) => void;
+  adjustHpManual: (characterId: number, newHp: number) => void;
   currentAp: { [characterId: number]: number };
-  performAttack: (attackerId: number, defenderId: number, success: boolean) => void;
+  performAttack: (
+    attackerId: number,
+    defenderId: number,
+    success: boolean,
+  ) => void;
   endTurn: () => void;
+  resetTurn: () => void;
   turnNumber: number;
 }
 
@@ -43,27 +52,32 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
   // init HP map from character data
   const initialHpMap = (characterData as Character[]).reduce(
     (acc, c) => ({ ...acc, [c.id]: c.status.hp }),
-    {} as { [characterId: number]: number }
+    {} as { [characterId: number]: number },
   );
   const [currentHp, setCurrentHp] = useState<{ [characterId: number]: number }>(
-    () => ({ ...initialHpMap })
+    () => ({ ...initialHpMap }),
   );
   // init AP map from character data
   const initialApMap = (characterData as Character[]).reduce(
     (acc, c) => ({ ...acc, [c.id]: c.status.ap }),
-    {} as { [characterId: number]: number }
+    {} as { [characterId: number]: number },
   );
   const [currentAp, setCurrentAp] = useState<{ [characterId: number]: number }>(
-    () => ({ ...initialApMap })
+    () => ({ ...initialApMap }),
   );
   const [turnNumber, setTurnNumber] = useState<number>(1);
 
   const addNotification = (
     message: string,
-    type: "success" | "info" | "error" = "info"
+    type: "success" | "info" | "error" = "info",
   ) => {
     const id = `${Date.now()}-${Math.random()}`;
-    const notification: Notification = { id, message, type, timestamp: Date.now() };
+    const notification: Notification = {
+      id,
+      message,
+      type,
+      timestamp: Date.now(),
+    };
 
     setNotifications((prev) => [...prev, notification]);
 
@@ -88,13 +102,13 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
       const updated = { ...prev, [characterId]: newHp };
 
       const character = (characterData as Character[]).find(
-        (c) => c.id === characterId
+        (c) => c.id === characterId,
       );
       const name = character?.name || `#${characterId}`;
 
       addNotification(
         `💥 ${name} รับความเสียหาย ${damage} (HP: ${newHp})`,
-        "info"
+        "info",
       );
 
       return updated;
@@ -111,7 +125,7 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
   const performAttack = (
     attackerId: number,
     defenderId: number,
-    success: boolean
+    success: boolean,
   ) => {
     const characters = characterData as Character[];
     const attacker = characters.find((c) => c.id === attackerId);
@@ -137,12 +151,12 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
       const dmg = attacker.status.attack?.damage ?? 0;
       // apply damage without showing notification
       _applyDamageInternal(defenderId, dmg);
-      
+
       // show single notification with complete information
       const newHp = Math.max(0, (currentHp[defenderId] ?? 0) - dmg);
       addNotification(
         `⚔️ ${attacker.name} โจมตี → ${defenderName} สำเร็จ! 💥 DMG: ${dmg}`,
-        "success"
+        "success",
       );
     } else {
       addNotification(`${attacker.name} โจมตี ${defenderName} พลาด`, "info");
@@ -156,6 +170,14 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
     addNotification(`🕒 จบเทิร์น คืน AP ให้ตัวละครทั้งหมด`, "info");
   };
 
+  const resetTurn = () => {
+    setTurnNumber(1);
+    // restore AP and HP to initial for all characters
+    setCurrentAp({ ...initialApMap });
+    setCurrentHp({ ...initialHpMap });
+    addNotification(`🕒 รีเซ็ตเทิร์นแล้ว - เลือด และ AP คืนครบ`, "info");
+  };
+
   const resetHp = (characterId: number) => {
     const init = initialHpMap[characterId];
     if (init === undefined) {
@@ -163,13 +185,41 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
       return;
     }
     setCurrentHp((prev) => ({ ...prev, [characterId]: init }));
-    const character = (characterData as Character[]).find((c) => c.id === characterId);
-    addNotification(`🔁 รีเซท HP ของ ${character?.name ?? `#${characterId}`}`, "info");
+    const character = (characterData as Character[]).find(
+      (c) => c.id === characterId,
+    );
+    addNotification(
+      `🔁 รีเซท HP ของ ${character?.name ?? `#${characterId}`}`,
+      "info",
+    );
+  };
+
+  const adjustHpManual = (characterId: number, newHp: number) => {
+    const character = (characterData as Character[]).find(
+      (c) => c.id === characterId,
+    );
+    const characterName = character?.name || `#${characterId}`;
+    const clampedHp = Math.max(0, newHp);
+    const oldHp = currentHp[characterId] ?? character?.status.hp ?? 0;
+
+    // show notification before state update
+    if (oldHp !== clampedHp) {
+      addNotification(
+        `🔧 ปรับเลือด ${characterName}: ${oldHp} → ${clampedHp}`,
+        "info"
+      );
+    }
+
+    // then update HP
+    setCurrentHp((prev) => ({
+      ...prev,
+      [characterId]: clampedHp,
+    }));
   };
 
   const addToTeam = (characterId: number, team: "A" | "B") => {
     const character = (characterData as Character[]).find(
-      (char) => char.id === characterId
+      (char) => char.id === characterId,
     );
     const characterName = character?.name || `Character #${characterId}`;
 
@@ -179,7 +229,7 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
         setTeamB((prev) => prev.filter((id) => id !== characterId));
       }
       setTeamA((prev) =>
-        prev.includes(characterId) ? prev : [...prev, characterId]
+        prev.includes(characterId) ? prev : [...prev, characterId],
       );
     } else {
       // ถ้าตัวละครอยู่ในทีม A แล้ว ให้ลบออก
@@ -187,7 +237,7 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
         setTeamA((prev) => prev.filter((id) => id !== characterId));
       }
       setTeamB((prev) =>
-        prev.includes(characterId) ? prev : [...prev, characterId]
+        prev.includes(characterId) ? prev : [...prev, characterId],
       );
     }
 
@@ -196,15 +246,12 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
       [characterId]: team,
     }));
 
-    addNotification(
-      `✅ เพิ่ม ${characterName} ไปทีม ${team}`,
-      "success"
-    );
+    addNotification(`✅ เพิ่ม ${characterName} ไปทีม ${team}`, "success");
   };
 
   const removeFromTeam = (characterId: number, team: "A" | "B") => {
     const character = (characterData as Character[]).find(
-      (char) => char.id === characterId
+      (char) => char.id === characterId,
     );
     const characterName = character?.name || `Character #${characterId}`;
 
@@ -219,10 +266,7 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
       [characterId]: null,
     }));
 
-    addNotification(
-      `❌ ลบ ${characterName} ออกจากทีม ${team}`,
-      "info"
-    );
+    addNotification(`❌ ลบ ${characterName} ออกจากทีม ${team}`, "info");
   };
 
   const isTeamDisabled = (characterId: number, team: "A" | "B"): boolean => {
@@ -244,9 +288,7 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
 
     // สุ่มเลือกตัวละครที่ยังไม่ได้เลือก
     const availableCharacters = characters.filter(
-      (char) =>
-        !currentTeam.includes(char.id) &&
-        !otherTeam.includes(char.id)
+      (char) => !currentTeam.includes(char.id) && !otherTeam.includes(char.id),
     );
 
     if (availableCharacters.length === 0) {
@@ -278,7 +320,7 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
 
     addNotification(
       `🎲 เพิ่มแบบสุ่ม ${countToAdd} ตัว ไปทีม ${team}: ${selectedNames}`,
-      "success"
+      "success",
     );
   };
 
@@ -306,9 +348,11 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
         currentHp,
         applyDamage,
         resetHp,
+        adjustHpManual,
         currentAp,
         performAttack,
         endTurn,
+        resetTurn,
         turnNumber,
       }}
     >

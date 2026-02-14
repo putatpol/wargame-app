@@ -17,8 +17,10 @@ export default function TeamsPage() {
     performAttack,
     addNotification,
     resetHp,
+    adjustHpManual,
     turnNumber,
     endTurn,
+    resetTurn,
     notifications,
   } = useTeam();
   const [attackerId, setAttackerId] = React.useState<number | null>(null);
@@ -35,6 +37,12 @@ export default function TeamsPage() {
     characterName: string;
   } | null>(null);
   const [actionPanelVisible, setActionPanelVisible] = React.useState(false);
+  const [hpAdjustModal, setHpAdjustModal] = React.useState<{
+    characterId: number;
+    characterName: string;
+    currentHp: number;
+  } | null>(null);
+  const [hpAdjustValue, setHpAdjustValue] = React.useState(0);
 
   const getCharacterById = (id: number) =>
     characters.find((char) => char.id === id);
@@ -62,18 +70,18 @@ export default function TeamsPage() {
               const isAttacker = attackerId === char.id;
               const isDefender = defenderId === char.id;
               const isDead = (currentHp?.[char.id] ?? char.status.hp) === 0;
-              
+
               const highlightClass = isAttacker
                 ? "ring-4 ring-yellow-400 bg-yellow-900/20"
                 : isDefender
                   ? "ring-4 ring-blue-400 bg-blue-900/20"
                   : "";
-              
+
               const cardColor = isDead
                 ? "border-red-500 bg-red-900/20"
                 : teamName === "A"
-                ? "border-blue-500 bg-blue-900/20"
-                : "border-green-500 bg-green-900/20";
+                  ? "border-blue-500 bg-blue-900/20"
+                  : "border-green-500 bg-green-900/20";
 
               return (
                 <div
@@ -197,7 +205,21 @@ export default function TeamsPage() {
                             }}
                             className="w-full text-left px-4 py-2 hover:bg-gray-700"
                           >
-                            รีเซทเลือด
+                            รีเซท HP
+                          </button>
+                          <button
+                            onClick={() => {
+                              setOpenMenuId(null);
+                              setHpAdjustModal({
+                                characterId: char.id,
+                                characterName: char.name,
+                                currentHp: currentHp?.[char.id] ?? char.status.hp,
+                              });
+                              setHpAdjustValue(0);
+                            }}
+                            className="w-full text-left px-4 py-2 hover:bg-gray-700"
+                          >
+                            ปรับ HP
                           </button>
                           <button
                             onClick={() => {
@@ -293,6 +315,12 @@ export default function TeamsPage() {
               className="bg-amber-500 hover:bg-amber-600 text-black px-3 py-1 rounded font-semibold"
             >
               End Turn
+            </button>
+            <button
+              onClick={() => resetTurn()}
+              className="bg-red-500 hover:bg-red-600 text-black px-3 py-1 rounded font-semibold"
+            >
+              Reset
             </button>
           </div>
         </div>
@@ -545,6 +573,73 @@ export default function TeamsPage() {
                 className="flex-1 bg-gray-600 hover:bg-gray-700 disabled:bg-gray-800 disabled:opacity-50 text-white px-3 py-2 rounded transition"
               >
                 โจมตีพลาด
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* HP Adjustment Modal */}
+      {hpAdjustModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-gray-800 border-2 border-yellow-500 rounded-lg p-6 max-w-sm w-full shadow-xl">
+            <h2 className="text-2xl font-bold text-yellow-400 mb-4">
+              ปรับ HP
+            </h2>
+            <p className="text-gray-300 mb-4">
+              <span className="font-bold text-amber-400">{hpAdjustModal.characterName}</span>
+              <br />
+              เลือดปัจจุบัน: <span className="text-red-400 font-bold">{hpAdjustModal.currentHp}</span>
+            </p>
+            
+            <div className="mb-4">
+              <label className="text-sm text-gray-300 block mb-2">เพิ่ม/ลดเลือด:</label>
+              <input
+                type="number"
+                value={hpAdjustValue}
+                onChange={(e) => setHpAdjustValue(parseInt(e.target.value) || 0)}
+                className="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white text-center"
+              />
+            </div>
+
+            <div className="flex gap-2 mb-4">
+              <button
+                onClick={() => setHpAdjustValue(hpAdjustValue - 5)}
+                className="flex-1 bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded font-semibold"
+              >
+                -5
+              </button>
+              <button
+                onClick={() => setHpAdjustValue(hpAdjustValue + 5)}
+                className="flex-1 bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded font-semibold"
+              >
+                +5
+              </button>
+            </div>
+
+            <p className="text-sm text-gray-400 mb-4 text-center">
+              เลือดสุดท้าย: <span className="font-bold text-white">{Math.max(0, hpAdjustModal.currentHp + hpAdjustValue)}</span>
+            </p>
+
+            <div className="flex gap-4">
+              <button
+                onClick={() => setHpAdjustModal(null)}
+                className="flex-1 bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded font-semibold transition"
+              >
+                ยกเลิก
+              </button>
+              <button
+                onClick={() => {
+                  if (hpAdjustModal) {
+                    const newHp = Math.max(0, hpAdjustModal.currentHp + hpAdjustValue);
+                    adjustHpManual(hpAdjustModal.characterId, newHp);
+                  }
+                  setHpAdjustModal(null);
+                  setHpAdjustValue(0);
+                }}
+                className="flex-1 bg-yellow-600 hover:bg-yellow-700 text-black px-4 py-2 rounded font-semibold transition"
+              >
+                ยืนยัน
               </button>
             </div>
           </div>
