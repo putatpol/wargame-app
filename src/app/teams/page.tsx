@@ -67,9 +67,17 @@ export default function TeamsPage() {
     characterId: number;
     characterName: string;
   } | null>(null);
+  const [changeBattleAction, setChangeBattleAction] = React.useState(false);
 
   const getCharacterById = (id: number) =>
     characters.find((char) => char.id === id);
+
+  const getTeamColorClass = (characterId?: number | null) => {
+    if (characterId == null) return "text-gray-400";
+    if (teamA.includes(characterId)) return "text-blue-500";
+    if (teamB.includes(characterId)) return "text-green-500";
+    return "text-gray-400";
+  };
 
   const getRaceBonus = (characterId: number, statType: string): number => {
     const character = getCharacterById(characterId);
@@ -392,15 +400,6 @@ export default function TeamsPage() {
                           <button
                             onClick={() => {
                               setOpenMenuId(null);
-                              resetHp(char.id);
-                            }}
-                            className="w-full text-left px-4 py-2 hover:bg-gray-700"
-                          >
-                            🔄 รีเซท HP
-                          </button>
-                          <button
-                            onClick={() => {
-                              setOpenMenuId(null);
                               setHpAdjustModal({
                                 characterId: char.id,
                                 characterName: char.name,
@@ -450,7 +449,10 @@ export default function TeamsPage() {
                         setActionPanelVisible(true);
                       }}
                       className="border border-amber-500 hover:bg-amber-600 disabled:opacity-50 disabled:cursor-not-allowed text-black px-4 py-2 rounded font-semibold"
-                      disabled={(currentHp?.[char.id] ?? char.status.hp) === 0}
+                      disabled={
+                        (currentHp?.[char.id] ?? char.status.hp) === 0 ||
+                        (currentAp?.[char.id] ?? 0) === 0
+                      }
                     >
                       ⚔️
                     </button>
@@ -476,6 +478,36 @@ export default function TeamsPage() {
                       disabled={(currentHp?.[char.id] ?? char.status.hp) === 0}
                     >
                       🛡️
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        const apLeft = currentAp?.[char.id] ?? 0;
+                        if (apLeft === 0) {
+                          addNotification(
+                            `${char.name} ไม่มี AP เหลืออยู่แล้ว`,
+                            "info",
+                          );
+                          return;
+                        }
+                        // reduce to zero this turn
+                        reduceAp(char.id, apLeft);
+                        addNotification(
+                          `⏭️ ${char.name} ข้ามเทิร์นนี้ - AP ถูกเซ็ตเป็น 0`,
+                          "info",
+                        );
+                        // if this character was selected as attacker/defender, clear selection
+                        if (attackerId === char.id) setAttackerId(null);
+                        if (defenderId === char.id) setDefenderId(null);
+                        setActionPanelVisible(false);
+                      }}
+                      className="border border-gray-500 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed text-white px-3 py-2 rounded font-semibold"
+                      disabled={
+                        (currentHp?.[char.id] ?? char.status.hp) === 0 ||
+                        (currentAp?.[char.id] ?? 0) === 0
+                      }
+                    >
+                      Skip
                     </button>
                   </div>
                 </div>
@@ -521,123 +553,6 @@ export default function TeamsPage() {
           <div>{renderTeam(teamA, "A", "text-blue-400")}</div>
           <div>{renderTeam(teamB, "B", "text-green-400")}</div>
         </div>
-
-        {/* Battle Panel */}
-        {/* <div className="mt-8 bg-gray-800 border border-amber-500 rounded-lg p-6">
-          <h3 className="text-2xl font-bold text-amber-400 mb-4">
-            สมรภูมิ (Battle)
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
-            <div>
-              <label className="text-sm text-gray-300">ผู้โจมตี</label>
-              <select
-                value={attackerId ?? ""}
-                onChange={(e) =>
-                  setAttackerId(
-                    e.target.value ? parseInt(e.target.value) : null,
-                  )
-                }
-                className="w-full mt-2 bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white"
-              >
-                <option value="">-- เลือกผู้โจมตี --</option>
-                {[...teamA, ...teamB].map((id) => {
-                  const c = getCharacterById(id);
-                  if (!c) return null;
-                  const teamLabel = teamA.includes(id) ? "A" : "B";
-                  return (
-                    <option key={id} value={id}>
-                      {c.name} (ทีม {teamLabel}) — HP:{" "}
-                      {currentHp?.[id] ?? c.status.hp}
-                    </option>
-                  );
-                })}
-              </select>
-            </div>
-
-            <div>
-              <label className="text-sm text-gray-300">ผู้ป้องกัน</label>
-              <select
-                value={defenderId ?? ""}
-                onChange={(e) =>
-                  setDefenderId(
-                    e.target.value ? parseInt(e.target.value) : null,
-                  )
-                }
-                className="w-full mt-2 bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white"
-              >
-                <option value="">-- เลือกผู้ป้องกัน --</option>
-                {[...teamA, ...teamB].map((id) => {
-                  const c = getCharacterById(id);
-                  if (!c) return null;
-                  const teamLabel = teamA.includes(id) ? "A" : "B";
-                  return (
-                    <option key={id} value={id}>
-                      {c.name} (ทีม {teamLabel}) — HP:{" "}
-                      {currentHp?.[id] ?? c.status.hp}
-                    </option>
-                  );
-                })}
-              </select>
-            </div>
-
-            <div className="flex gap-2">
-              <button
-                disabled={isAttacking}
-                onClick={() => {
-                  if (!attackerId || !defenderId)
-                    return addNotification(
-                      "กรุณาเลือกผู้โจมตีและผู้ป้องกัน",
-                      "error",
-                    );
-                  if (attackerId === defenderId)
-                    return addNotification("ไม่สามารถโจมตีตัวเองได้", "error");
-                  const atk = getCharacterById(attackerId);
-                  if (!atk) return;
-                  setIsAttacking(true);
-                  performAttack(
-                    attackerId as number,
-                    defenderId as number,
-                    true,
-                  );
-                  setTimeout(() => setIsAttacking(false), 3000);
-                  // ปิด dialog หากผู้โจมตีไม่มี AP เหลือ
-                  if ((currentAp[attackerId] ?? 0) <= 0) {
-                    setActionPanelVisible(false);
-                  }
-                }}
-                className="bg-red-600 hover:bg-red-700 disabled:bg-red-900 disabled:opacity-50 text-white px-4 py-2 rounded font-semibold transition"
-              >
-                โจมตีสำเร็จ
-              </button>
-              <button
-                disabled={isAttacking}
-                onClick={() => {
-                  if (!attackerId || !defenderId)
-                    return addNotification(
-                      "กรุณาเลือกผู้โจมตีและผู้ป้องกัน",
-                      "error",
-                    );
-                  if (attackerId === defenderId)
-                    return addNotification("ไม่สามารถโจมตีตัวเองได้", "error");
-                  setIsAttacking(true);
-                  performAttack(
-                    attackerId as number,
-                    defenderId as number,
-                    false,
-                  );
-                  setTimeout(() => setIsAttacking(false), 3000);
-                  // ปิด dialog หากผู้โจมตีไม่มี AP เหลือ
-                  if ((currentAp[attackerId] ?? 0) <= 0) {
-                    setActionPanelVisible(false);
-                  }
-                }}
-                className="bg-gray-600 hover:bg-gray-700 disabled:bg-gray-800 disabled:opacity-50 text-white px-4 py-2 rounded font-semibold transition"
-              >
-                โจมตีพลาด
-              </button>
-            </div>
-          </div>
-        </div> */}
 
         {/* Summary */}
         <div className="mt-8 bg-gray-800 border border-amber-500 rounded-lg p-6">
@@ -690,57 +605,92 @@ export default function TeamsPage() {
 
       {/* Action Panel (bottom-left) */}
       {actionPanelVisible && (
-        <div className="fixed left-4 bottom-4 z-50">
+        <div
+          className={`${changeBattleAction ? "left-4" : "right-4"} fixed bottom-4 z-50`}
+        >
           <div className="bg-gray-800 border border-amber-500 rounded-lg p-4 w-80 shadow-xl">
             <div className="flex justify-between items-center mb-2">
               <div className="text-sm text-gray-300">Battle Action</div>
-              <button
-                onClick={() => {
-                  setActionPanelVisible(false);
-                  setAttackerId(null);
-                  setDefenderId(null);
-                  setMeleeBonus(false);
-                  setLightCover(false);
-                  setCounterAttack(false);
-                  setSelectedSkill(null);
-                }}
-                className="text-white bg-gray-700 hover:bg-gray-600 rounded px-2 py-1"
-              >
-                ✕
-              </button>
+              <div className="flex gap-2 text-sm">
+                <button
+                  onClick={() => setChangeBattleAction(!changeBattleAction)}
+                  className="text-white bg-gray-700 hover:bg-gray-600 rounded px-2 py-1"
+                >
+                  {changeBattleAction ? "»" : "«"}
+                </button>
+                <button
+                  onClick={() => {
+                    setActionPanelVisible(false);
+                    setAttackerId(null);
+                    setDefenderId(null);
+                    setMeleeBonus(false);
+                    setLightCover(false);
+                    setCounterAttack(false);
+                    setSelectedSkill(null);
+                  }}
+                  className="text-white bg-gray-700 hover:bg-gray-600 rounded px-2 py-1"
+                >
+                  ✕
+                </button>
+              </div>
             </div>
             <div className="text-sm text-gray-200 mb-3">
               <div className="flex justify-between items-center">
-                <div>
-                  ผู้โจมตี:{" "}
-                  <b className="text-amber-300">
-                    {attackerId ? getCharacterById(attackerId)?.name : "-"}
-                  </b>
+                <div className="flex items-center gap-2">
+                  {attackerId && (
+                    <Image
+                      src={getCharacterById(attackerId)?.avatar || ""}
+                      alt="attacker"
+                      width={40}
+                      height={40}
+                      className="rounded border border-amber-300"
+                    />
+                  )}
+                  <div>
+                    ผู้โจมตี:{" "}
+                    <b className="text-amber-300">
+                      {attackerId ? getCharacterById(attackerId)?.name : "-"}
+                    </b>
+                  </div>
                 </div>
                 {attackerId && (
                   <div className="text-xs text-gray-400">
                     Hit:{" "}
-                    <span className="text-green-500 text-xl">
-                      {(getCharacterById(attackerId)?.status.attack.hitOn ??
-                        0) + (meleeBonus ? 4 : 0)}
+                    <span
+                      className={`${getTeamColorClass(attackerId)} text-xl`}
+                    >
+                      {getDisplayStat(attackerId, "hiton") +
+                        (meleeBonus ? 4 : 0)}
                       +
                     </span>
                   </div>
                 )}
               </div>
               <div className="mt-2 flex justify-between items-center">
-                <div>
-                  ผู้ป้องกัน:{" "}
-                  <b className="text-amber-300">
-                    {defenderId ? getCharacterById(defenderId)?.name : "-"}
-                  </b>
+                <div className="flex items-center gap-2">
+                  {defenderId && (
+                    <Image
+                      src={getCharacterById(defenderId)?.avatar || ""}
+                      alt="defender"
+                      width={40}
+                      height={40}
+                      className="rounded border border-amber-300"
+                    />
+                  )}
+                  <div>
+                    ผู้ป้องกัน:{" "}
+                    <b className="text-amber-300">
+                      {defenderId ? getCharacterById(defenderId)?.name : "-"}
+                    </b>
+                  </div>
                 </div>
                 {defenderId && (
                   <div className="text-xs text-gray-400">
                     Def:{" "}
-                    <span className="text-blue-500 text-xl">
-                      {(getCharacterById(defenderId)?.status.def ?? 0) -
-                        (lightCover ? 2 : 0)}
+                    <span
+                      className={`${getTeamColorClass(defenderId)} text-xl`}
+                    >
+                      {getDisplayStat(defenderId, "def") - (lightCover ? 2 : 0)}
                       +
                     </span>
                   </div>
@@ -789,18 +739,21 @@ export default function TeamsPage() {
             {/* Skill Selection */}
             {attackerId && (
               <div className="mb-3 p-2 bg-gray-700/50 rounded">
-                <p className="text-xs font-bold text-gray-300 mb-2">
-                  ใช้สกิล
-                </p>
+                <p className="text-xs font-bold text-gray-300 mb-2">ใช้สกิล</p>
                 <div className="grid grid-cols-2 gap-1">
                   {(getCharacterById(attackerId)?.skills ?? []).map((skill) => (
                     <button
                       key={skill.id}
-                      onClick={() =>
+                      onClick={() => {
                         setSelectedSkill(
-                          selectedSkill === skill.id ? null : skill.id
-                        )
-                      }
+                          selectedSkill === skill.id ? null : skill.id,
+                        );
+                        setCardModal({
+                          cardImage: skill.card,
+                          characterName:
+                            getCharacterById(attackerId)?.name || "Unknown",
+                        });
+                      }}
                       className={`px-2 py-1 rounded text-xs font-semibold transition ${
                         selectedSkill === skill.id
                           ? "bg-purple-600 hover:bg-purple-700 text-white"
@@ -828,16 +781,25 @@ export default function TeamsPage() {
               <div className="mb-3 p-2 bg-purple-900/30 border border-purple-600 rounded">
                 <p className="text-xs text-purple-300 mb-2">
                   {getCharacterById(attackerId)?.skills.find(
-                    (s) => s.id === selectedSkill
+                    (s) => s.id === selectedSkill,
                   )?.name || "Skill"}{" "}
-                  - ค่าใช้: {getCharacterById(attackerId)?.skills.find(s => s.id === selectedSkill)?.ap} AP
+                  - ค่าใช้:{" "}
+                  {
+                    getCharacterById(attackerId)?.skills.find(
+                      (s) => s.id === selectedSkill,
+                    )?.ap
+                  }{" "}
+                  AP
                 </p>
                 <div className="flex gap-2">
                   <button
                     disabled={isAttacking}
                     onClick={() => {
                       if (!attackerId || !defenderId) {
-                        addNotification("กรุณาเลือกผู้โจมตีและผู้ป้องกัน", "error");
+                        addNotification(
+                          "กรุณาเลือกผู้โจมตีและผู้ป้องกัน",
+                          "error",
+                        );
                         return;
                       }
                       if (attackerId === defenderId) {
@@ -845,7 +807,7 @@ export default function TeamsPage() {
                         return;
                       }
                       const skill = getCharacterById(attackerId)?.skills.find(
-                        (s) => s.id === selectedSkill
+                        (s) => s.id === selectedSkill,
                       );
                       if (!skill) {
                         addNotification("ไม่พบสกิล", "error");
@@ -855,7 +817,7 @@ export default function TeamsPage() {
                       if (currentCharAp < skill.ap) {
                         addNotification(
                           `${getCharacterById(attackerId)?.name} ไม่มี AP พอ (ต้อง: ${skill.ap}, มี: ${currentCharAp})`,
-                          "error"
+                          "error",
                         );
                         return;
                       }
@@ -865,7 +827,7 @@ export default function TeamsPage() {
                       const defender = getCharacterById(defenderId);
                       addNotification(
                         `✨ ${attacker?.name} ใช้ ${skill.name} โจมตี ${defender?.name}`,
-                        "success"
+                        "success",
                       );
                       setTimeout(() => {
                         setIsAttacking(false);
@@ -873,6 +835,7 @@ export default function TeamsPage() {
                         setLightCover(false);
                         setSelectedSkill(null);
                       }, 2000);
+                      setCardModal(null);
                     }}
                     className="flex-1 bg-purple-600 hover:bg-purple-700 disabled:bg-purple-900 disabled:opacity-50 text-white px-3 py-2 rounded transition text-sm font-semibold"
                   >
@@ -890,15 +853,24 @@ export default function TeamsPage() {
                 </p>
                 <div className="text-xs text-red-200 mb-2 space-y-1">
                   <div>
-                    <span className="font-semibold">โจมตีกลับ:</span> {getCharacterById(defenderId)?.name}
+                    <span className="font-semibold">โจมตีกลับ:</span>{" "}
+                    {getCharacterById(defenderId)?.name}
                     <br />
-                    <span className="text-red-300">🎯 Hit On: {getCharacterById(defenderId)?.status.attack.hitOn ?? 0}+</span>
-                    <span className="text-orange-300 ml-2">💥 DMG: {getCharacterById(defenderId)?.status.attack.damage}</span>
+                    <span className="text-red-300">
+                      🎯 Hit On: {getDisplayStat(defenderId, "hiton")}+
+                    </span>
+                    <span className="text-orange-300 ml-2">
+                      💥 DMG:{" "}
+                      {getCharacterById(defenderId)?.status.attack.damage}
+                    </span>
                   </div>
                   <div>
-                    <span className="font-semibold">ถูกโจมตี:</span> {getCharacterById(attackerId)?.name}
+                    <span className="font-semibold">ถูกโจมตี:</span>{" "}
+                    {getCharacterById(attackerId)?.name}
                     <br />
-                    <span className="text-blue-300">🛡️ DEF: {getCharacterById(attackerId)?.status.def}</span>
+                    <span className="text-blue-300">
+                      🛡️ DEF: {getDisplayStat(attackerId, "def")}
+                    </span>
                   </div>
                 </div>
                 <div className="flex gap-2">
@@ -906,7 +878,10 @@ export default function TeamsPage() {
                     disabled={isAttacking}
                     onClick={() => {
                       if (!attackerId || !defenderId) {
-                        addNotification("กรุณาเลือกผู้โจมตีและผู้ป้องกัน", "error");
+                        addNotification(
+                          "กรุณาเลือกผู้โจมตีและผู้ป้องกัน",
+                          "error",
+                        );
                         return;
                       }
                       setIsAttacking(true);
@@ -915,16 +890,16 @@ export default function TeamsPage() {
                       const counterDamage = defender?.status.attack.damage ?? 0;
                       const currentCharHp = currentHp[attackerId] ?? 0;
                       const newHp = Math.max(0, currentCharHp - counterDamage);
-                      
+
                       // Counter attack สำเร็จ - ลด HP ของผู้โจมตี
                       _applyDamageInternal(attackerId, counterDamage);
-                      
+
                       // แจ้งเตือนครั้งเดียว
                       addNotification(
                         `⚡ ${defender?.name} โจมตีกลับ ${attacker?.name}! 💥 DMG: ${counterDamage} (HP: ${newHp})`,
-                        "success"
+                        "success",
                       );
-                      
+
                       setTimeout(() => {
                         setIsAttacking(false);
                         setMeleeBonus(false);
@@ -953,6 +928,7 @@ export default function TeamsPage() {
                     return;
                   }
                   setIsAttacking(true);
+                  // Normal successful attack (consume AP inside performAttack)
                   performAttack(
                     attackerId as number,
                     defenderId as number,
@@ -967,6 +943,60 @@ export default function TeamsPage() {
                 className="flex-1 bg-red-600 hover:bg-red-700 disabled:bg-red-900 disabled:opacity-50 text-white px-3 py-2 rounded transition"
               >
                 โจมตีสำเร็จ
+              </button>
+              <button
+                disabled={isAttacking}
+                onClick={() => {
+                  if (!attackerId || !defenderId) {
+                    addNotification("กรุณาเลือกผู้โจมตีและผู้ป้องกัน", "error");
+                    return;
+                  }
+                  if (attackerId === defenderId) {
+                    addNotification("ไม่สามารถโจมตีตัวเองได้", "error");
+                    return;
+                  }
+
+                  const attacker = getCharacterById(attackerId);
+                  if (!attacker) return;
+
+                  const apCost = attacker.status.attack?.ap ?? 1;
+                  const attackerAp = currentAp[attackerId] ?? 0;
+                  if (attackerAp < apCost) {
+                    addNotification(
+                      `${attacker.name} ไม่มี AP พอสำหรับการโจมตี`,
+                      "error",
+                    );
+                    return;
+                  }
+
+                  setIsAttacking(true);
+                  // consume AP
+                  reduceAp(attackerId, apCost);
+
+                  const baseDmg = attacker.status.attack?.damage ?? 0;
+                  const critDmg = Math.ceil(baseDmg * 1.5);
+
+                  // apply damage without duplicate notification
+                  _applyDamageInternal(defenderId, critDmg);
+
+                  const newHp = Math.max(
+                    0,
+                    (currentHp[defenderId] ?? 0) - critDmg,
+                  );
+                  addNotification(
+                    `💥 ${attacker.name} โจมตีแบบ Critical → ${getCharacterById(defenderId)?.name}! DMG: ${critDmg} (HP: ${newHp})`,
+                    "success",
+                  );
+
+                  setTimeout(() => {
+                    setIsAttacking(false);
+                    setMeleeBonus(false);
+                    setLightCover(false);
+                  }, 3000);
+                }}
+                className="flex-1 text-white bg-amber-700 hover:bg-amber-800 disabled:bg-amber-900 disabled:opacity-50 px-3 py-2 rounded transition"
+              >
+                โจมตี Critical
               </button>
               <button
                 disabled={isAttacking}
@@ -1004,8 +1034,21 @@ export default function TeamsPage() {
       {hpAdjustModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
           <div className="bg-gray-800 border-2 border-yellow-500 rounded-lg p-6 max-w-sm w-full shadow-xl">
-            <h2 className="text-2xl font-bold text-yellow-400 mb-4">ปรับ HP</h2>
-            <p className="text-gray-300 mb-4">
+            <div className="flex justify-between mb-4">
+              <h2 className="text-2xl font-bold text-yellow-400">
+                ปรับ HP
+              </h2>
+              <button
+                className=" text-white bg-gray-600 hover:bg-gray-700 px-2 rounded"
+                onClick={() => {
+                  setOpenMenuId(null);
+                  resetHp(hpAdjustModal.characterId);
+                }}
+              >
+                reset
+              </button>
+            </div>
+            <p className="text-gray-300">
               <span className="font-bold text-amber-400">
                 {hpAdjustModal.characterName}
               </span>

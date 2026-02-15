@@ -28,6 +28,10 @@ body {
   font-family: var(--font-kanit);
 }
 
+button {
+  @apply hover:cursor-pointer;
+}
+
 @keyframes fadeInUp {
   from {
     opacity: 0;

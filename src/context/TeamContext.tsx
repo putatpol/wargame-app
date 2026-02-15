@@ -205,7 +205,11 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
       addNotification(`ไม่พบตัวละคร ID ${characterId} เพื่อรีเซท HP`, "error");
       return;
     }
-    setCurrentHp((prev) => ({ ...prev, [characterId]: init }));
+    
+    // Include HP stat boost if applied
+    const hpWithBoost = characterStatBoost[characterId] === "hp" ? init + 2 : init;
+    
+    setCurrentHp((prev) => ({ ...prev, [characterId]: hpWithBoost }));
     const character = (characterData as Character[]).find(
       (c) => c.id === characterId,
     );
