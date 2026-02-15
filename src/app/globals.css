@@ -21,7 +21,9 @@
 }
 
 body {
-  background: var(--background);
+  background: url('/images/bg.png') no-repeat center center fixed;
+  background-size: cover;
+  background-attachment: fixed;
   color: var(--foreground);
   font-family: var(--font-kanit);
 }

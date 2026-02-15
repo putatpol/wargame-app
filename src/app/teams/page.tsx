@@ -18,6 +18,7 @@ export default function TeamsPage() {
     currentHp,
     currentAp,
     performAttack,
+    applyDamage,
     addNotification,
     resetHp,
     adjustHpManual,
@@ -30,6 +31,8 @@ export default function TeamsPage() {
     activeStatusBuffs,
     addStatusBuff,
     removeStatusBuff,
+    reduceAp,
+    _applyDamageInternal,
   } = useTeam();
   const [attackerId, setAttackerId] = React.useState<number | null>(null);
   const [defenderId, setDefenderId] = React.useState<number | null>(null);
@@ -53,6 +56,8 @@ export default function TeamsPage() {
   const [hpAdjustValue, setHpAdjustValue] = React.useState(0);
   const [meleeBonus, setMeleeBonus] = React.useState(false);
   const [lightCover, setLightCover] = React.useState(false);
+  const [counterAttack, setCounterAttack] = React.useState(false);
+  const [selectedSkill, setSelectedSkill] = React.useState<number | null>(null);
   const [statBoostModal, setStatBoostModal] = React.useState<{
     characterId: number;
     characterName: string;
@@ -143,6 +148,7 @@ export default function TeamsPage() {
               const isAttacker = attackerId === char.id;
               const isDefender = defenderId === char.id;
               const isDead = (currentHp?.[char.id] ?? char.status.hp) === 0;
+              const isOutOfAp = (currentAp?.[char.id] ?? 0) === 0;
 
               const highlightClass = isAttacker
                 ? "ring-4 ring-yellow-400 bg-yellow-900/20"
@@ -152,9 +158,11 @@ export default function TeamsPage() {
 
               const cardColor = isDead
                 ? "border-red-500 bg-red-900/20"
-                : teamName === "A"
-                  ? "border-blue-500 bg-blue-900/20"
-                  : "border-green-500 bg-green-900/20";
+                : isOutOfAp
+                  ? "border-gray-500 bg-gray-600/20"
+                  : teamName === "A"
+                    ? "border-blue-500 bg-blue-900/20"
+                    : "border-green-500 bg-green-900/20";
 
               return (
                 <div
@@ -216,8 +224,7 @@ export default function TeamsPage() {
                     <div>
                       <p className="text-gray-400">HP</p>
                       <p className="font-semibold text-red-400">
-                        {(currentHp?.[char.id] ?? char.status.hp) +
-                          getStatBoostByType(char.id, "hp")}
+                        {currentHp?.[char.id] ?? char.status.hp}
                         {characterStatBoost[char.id] === "hp" && (
                           <span className="text-purple-400 ml-1">(+2)</span>
                         )}
@@ -482,9 +489,9 @@ export default function TeamsPage() {
 
   return (
     <div className="p-4">
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-7xl mx-auto  bg-gray-950/75 px-10 py-5 rounded-lg border border-amber-500 shadow-lg">
         <h1 className="text-4xl font-bold text-amber-400 mb-8 text-center">
-          รายการทีม
+          Let's Battle!
         </h1>
 
         <div className="flex items-center justify-between mb-4">
@@ -694,6 +701,8 @@ export default function TeamsPage() {
                   setDefenderId(null);
                   setMeleeBonus(false);
                   setLightCover(false);
+                  setCounterAttack(false);
+                  setSelectedSkill(null);
                 }}
                 className="text-white bg-gray-700 hover:bg-gray-600 rounded px-2 py-1"
               >
@@ -730,7 +739,7 @@ export default function TeamsPage() {
                   <div className="text-xs text-gray-400">
                     Def:{" "}
                     <span className="text-blue-500 text-xl">
-                      {(getCharacterById(defenderId)?.status.def ?? 0) +
+                      {(getCharacterById(defenderId)?.status.def ?? 0) -
                         (lightCover ? 2 : 0)}
                       +
                     </span>
@@ -763,7 +772,174 @@ export default function TeamsPage() {
               >
                 {lightCover ? "๏ Covered" : "Cover"}
               </button>
+              {defenderId && (
+                <button
+                  onClick={() => setCounterAttack(!counterAttack)}
+                  className={`w-full px-2 py-1 rounded font-semibold transition text-xs ${
+                    counterAttack
+                      ? "bg-red-600 hover:bg-red-700 text-white"
+                      : " border border-red-500 hover:bg-red-900/30 text-red-300"
+                  }`}
+                >
+                  {counterAttack ? "๏ Counter" : "Counter"}
+                </button>
+              )}
             </div>
+
+            {/* Skill Selection */}
+            {attackerId && (
+              <div className="mb-3 p-2 bg-gray-700/50 rounded">
+                <p className="text-xs font-bold text-gray-300 mb-2">
+                  ใช้สกิล
+                </p>
+                <div className="grid grid-cols-2 gap-1">
+                  {(getCharacterById(attackerId)?.skills ?? []).map((skill) => (
+                    <button
+                      key={skill.id}
+                      onClick={() =>
+                        setSelectedSkill(
+                          selectedSkill === skill.id ? null : skill.id
+                        )
+                      }
+                      className={`px-2 py-1 rounded text-xs font-semibold transition ${
+                        selectedSkill === skill.id
+                          ? "bg-purple-600 hover:bg-purple-700 text-white"
+                          : "border border-purple-500 hover:bg-purple-900/30 text-purple-300"
+                      } ${
+                        (currentAp[attackerId] ?? 0) < skill.ap
+                          ? "opacity-50 cursor-not-allowed"
+                          : ""
+                      }`}
+                      disabled={(currentAp[attackerId] ?? 0) < skill.ap}
+                      title={`${skill.name} - AP Cost: ${skill.ap}`}
+                    >
+                      {skill.name}
+                      <span className="text-xs text-yellow-300 ml-1">
+                        ({skill.ap}AP)
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Skill Usage Buttons */}
+            {selectedSkill && attackerId && (
+              <div className="mb-3 p-2 bg-purple-900/30 border border-purple-600 rounded">
+                <p className="text-xs text-purple-300 mb-2">
+                  {getCharacterById(attackerId)?.skills.find(
+                    (s) => s.id === selectedSkill
+                  )?.name || "Skill"}{" "}
+                  - ค่าใช้: {getCharacterById(attackerId)?.skills.find(s => s.id === selectedSkill)?.ap} AP
+                </p>
+                <div className="flex gap-2">
+                  <button
+                    disabled={isAttacking}
+                    onClick={() => {
+                      if (!attackerId || !defenderId) {
+                        addNotification("กรุณาเลือกผู้โจมตีและผู้ป้องกัน", "error");
+                        return;
+                      }
+                      if (attackerId === defenderId) {
+                        addNotification("ไม่สามารถโจมตีตัวเองได้", "error");
+                        return;
+                      }
+                      const skill = getCharacterById(attackerId)?.skills.find(
+                        (s) => s.id === selectedSkill
+                      );
+                      if (!skill) {
+                        addNotification("ไม่พบสกิล", "error");
+                        return;
+                      }
+                      const currentCharAp = currentAp[attackerId] ?? 0;
+                      if (currentCharAp < skill.ap) {
+                        addNotification(
+                          `${getCharacterById(attackerId)?.name} ไม่มี AP พอ (ต้อง: ${skill.ap}, มี: ${currentCharAp})`,
+                          "error"
+                        );
+                        return;
+                      }
+                      setIsAttacking(true);
+                      reduceAp(attackerId, skill.ap);
+                      const attacker = getCharacterById(attackerId);
+                      const defender = getCharacterById(defenderId);
+                      addNotification(
+                        `✨ ${attacker?.name} ใช้ ${skill.name} โจมตี ${defender?.name}`,
+                        "success"
+                      );
+                      setTimeout(() => {
+                        setIsAttacking(false);
+                        setMeleeBonus(false);
+                        setLightCover(false);
+                        setSelectedSkill(null);
+                      }, 2000);
+                    }}
+                    className="flex-1 bg-purple-600 hover:bg-purple-700 disabled:bg-purple-900 disabled:opacity-50 text-white px-3 py-2 rounded transition text-sm font-semibold"
+                  >
+                    ใช้สกิล
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Counter Attack Confirmation */}
+            {counterAttack && attackerId && defenderId && (
+              <div className="mb-3 p-2 bg-red-900/30 border border-red-600 rounded">
+                <p className="text-xs text-red-300 mb-2">
+                  ✓ {getCharacterById(defenderId)?.name} จะโจมตีกลับ (AP ไม่ลด)
+                </p>
+                <div className="text-xs text-red-200 mb-2 space-y-1">
+                  <div>
+                    <span className="font-semibold">โจมตีกลับ:</span> {getCharacterById(defenderId)?.name}
+                    <br />
+                    <span className="text-red-300">🎯 Hit On: {getCharacterById(defenderId)?.status.attack.hitOn ?? 0}+</span>
+                    <span className="text-orange-300 ml-2">💥 DMG: {getCharacterById(defenderId)?.status.attack.damage}</span>
+                  </div>
+                  <div>
+                    <span className="font-semibold">ถูกโจมตี:</span> {getCharacterById(attackerId)?.name}
+                    <br />
+                    <span className="text-blue-300">🛡️ DEF: {getCharacterById(attackerId)?.status.def}</span>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    disabled={isAttacking}
+                    onClick={() => {
+                      if (!attackerId || !defenderId) {
+                        addNotification("กรุณาเลือกผู้โจมตีและผู้ป้องกัน", "error");
+                        return;
+                      }
+                      setIsAttacking(true);
+                      const defender = getCharacterById(defenderId);
+                      const attacker = getCharacterById(attackerId);
+                      const counterDamage = defender?.status.attack.damage ?? 0;
+                      const currentCharHp = currentHp[attackerId] ?? 0;
+                      const newHp = Math.max(0, currentCharHp - counterDamage);
+                      
+                      // Counter attack สำเร็จ - ลด HP ของผู้โจมตี
+                      _applyDamageInternal(attackerId, counterDamage);
+                      
+                      // แจ้งเตือนครั้งเดียว
+                      addNotification(
+                        `⚡ ${defender?.name} โจมตีกลับ ${attacker?.name}! 💥 DMG: ${counterDamage} (HP: ${newHp})`,
+                        "success"
+                      );
+                      
+                      setTimeout(() => {
+                        setIsAttacking(false);
+                        setMeleeBonus(false);
+                        setLightCover(false);
+                        setCounterAttack(false);
+                      }, 2000);
+                    }}
+                    className="flex-1 bg-red-600 hover:bg-red-700 disabled:bg-red-900 disabled:opacity-50 text-white px-3 py-2 rounded transition text-sm font-semibold"
+                  >
+                    โจมตีกลับ
+                  </button>
+                </div>
+              </div>
+            )}
+
             <div className="flex gap-2">
               <button
                 disabled={isAttacking}

@@ -32,7 +32,7 @@ export function Navbar() {
                 : "text-white hover:bg-gray-700"
             }`}
           >
-            ดูทีม
+            เล่น
           </Link>
         </div>
       </div>

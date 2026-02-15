@@ -68,7 +68,7 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-900 text-white">
+      <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-900/75 text-white rounded-lg shadow-lg mx-auto">
         {characters.map((char) => (
           <div
             key={char.id}

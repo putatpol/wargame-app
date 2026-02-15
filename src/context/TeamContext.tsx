@@ -28,9 +28,11 @@ interface TeamContextType {
   ) => void;
   currentHp: { [characterId: number]: number };
   applyDamage: (characterId: number, damage: number) => void;
+  _applyDamageInternal: (characterId: number, damage: number) => void;
   resetHp: (characterId: number) => void;
   adjustHpManual: (characterId: number, newHp: number) => void;
   currentAp: { [characterId: number]: number };
+  reduceAp: (characterId: number, amount: number) => void;
   performAttack: (
     attackerId: number,
     defenderId: number,
@@ -55,9 +57,16 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
     [characterId: number]: "A" | "B" | null;
   }>({});
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  // init HP map from character data
+  
+  // Helper: Get race bonus for HP
+  const getRaceHpBonus = (character: Character): number => {
+    if (character.race === "Goliath") return 3;
+    return 0;
+  };
+  
+  // init HP map from character data including race bonuses
   const initialHpMap = (characterData as Character[]).reduce(
-    (acc, c) => ({ ...acc, [c.id]: c.status.hp }),
+    (acc, c) => ({ ...acc, [c.id]: c.status.hp + getRaceHpBonus(c) }),
     {} as { [characterId: number]: number },
   );
   const [currentHp, setCurrentHp] = useState<{ [characterId: number]: number }>(
@@ -378,6 +387,14 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
       ...prev,
       [characterId]: stat,
     }));
+    
+    // หากเพิ่ม HP boost ให้เพิ่ม currentHp ด้วย
+    if (stat === "hp") {
+      setCurrentHp((prev) => ({
+        ...prev,
+        [characterId]: (prev[characterId] ?? 0) + 2,
+      }));
+    }
 
     const statLabels: { [key: string]: string } = {
       move: "Move +1",
@@ -450,9 +467,11 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
         addNotification,
         currentHp,
         applyDamage,
+        _applyDamageInternal,
         resetHp,
         adjustHpManual,
         currentAp,
+        reduceAp,
         performAttack,
         endTurn,
         resetTurn,
