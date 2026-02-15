@@ -1,0 +1,57 @@
+[
+  {
+    "id": 1,
+    "name": "Human",
+    "description": "เลือกบวก Status ที่ต้องการได้ 1 อย่างตอนเริ่มเกม"
+  },
+  {
+    "id": 2,
+    "name": "Half-Orc",
+    "description": "เมื่อ HP เหลือ 0 ครั้งแรกในเกม จะกลับมาเหลือ 1 HP ทันที"
+  },
+  {
+    "id": 3,
+    "name": "Vampire",
+    "description": "ถ้าฆ่าศัตรูได้ ฟื้นฟู 2 HP"
+  },
+  {
+    "id": 4,
+    "name": "Dragonfolk",
+    "description": "เมินดาเมจจากสถานะ Burn, Bleed หรือ Poison 2 Dmg"
+  },
+  {
+    "id": 5,
+    "name": "Tiefling",
+    "description": "เมื่อศัตรูในระยะประชิดโจมตีพลาด จะสวนกลับศัตรูได้รับดาเมจ Fixed 1"
+  },
+  {
+    "id": 6,
+    "name": "Dwarf",
+    "description": "Def +1 (ป้องกันดีขึ้น) แต่ M -1 (เดินช้าลงจากขนาดตัว)"
+  },
+  {
+    "id": 7,
+    "name": "Goliath",
+    "description": "HP +3 แต่ Def -1 และไม่ถูกผลักกระเด็น"
+  },
+  {
+    "id": 8,
+    "name": "Elf",
+    "description": "M +1 และเมินโทษจากการเดินผ่านพื้นที่ยาก"
+  },
+  {
+    "id": 9,
+    "name": "Celestial",
+    "description": "ยูนิตพันธมิตรรอบตัว 3 ได้โบนัสเกราะศักดิ์สิทธิ์ Def +1"
+  },
+  {
+    "id": 10,
+    "name": "Beastkin",
+    "description": "หากโดน charge สามารถถอยหลัง 1"
+  },
+  {
+    "id": 11,
+    "name": "Gnome",
+    "description": "สามารถทอยลูกเต๋าใหม่ได้ 1 ครั้ง เมื่อทอยได้ต่ำกว่าหน้า 5"
+  }
+]

@@ -4,132 +4,175 @@
     "engName": "guard",
     "thaiName": "ป้องกัน",
     "stat": "action",
-    "description": "ตั้งการ์ดป้องกัน def -1"
+    "description": "ตั้งการ์ดป้องกัน def -1",
+    "image": "/images/status/guard.PNG"
   },
   {
     "id": 2,
     "engName": "overwatch",
     "thaiName": "ตอบโต้",
     "stat": "action",
-    "description": "ตั้งการ์ดยิงตอบโต้"
+    "description": "ตั้งการ์ดยิงตอบโต้",
+    "image": "/images/status/overwatch.PNG"
   },
   {
     "id": 3,
     "engName": "aid",
     "thaiName": "ช่วยเหลือ",
     "stat": "action",
-    "description": "ได้รับการช่วยเหลือจากเพื่อน on hit -1"
+    "description": "ได้รับการช่วยเหลือจากเพื่อน on hit -1",
+    "image": "/images/status/aid.PNG"
   },
   {
     "id": 4,
     "engName": "rest",
     "thaiName": "พักผ่อน",
     "stat": "action",
-    "description": "พักผ่อนฟื้นฟูพลัง hp +3"
+    "description": "พักผ่อนฟื้นฟูพลัง hp +3",
+    "image": "/images/status/rest.PNG"
   },
   {
     "id": 5,
     "engName": "hide",
     "thaiName": "ซ่อนตัว",
     "stat": "action",
-    "description": "หลบการโจมตีใน cover"
+    "description": "หลบการโจมตีใน cover",
+    "image": "/images/status/hide.PNG"
   },
   {
     "id": 6,
     "engName": "prone",
     "thaiName": "ล้ม",
     "stat": "debuff",
-    "description": "ถูกผลักล้มลงพื้น ต้องใช้ 1ap ลุกขึ้น"
+    "description": "ถูกผลักล้มลงพื้น ต้องใช้ 1ap ลุกขึ้น",
+    "image": "/images/status/prone.PNG"
   },
   {
     "id": 7,
     "engName": "anchored",
     "thaiName": "ถูกล่าม",
     "stat": "debuff",
-    "description": "เคลื่อนที่ไม่ได้ แต่ทำ action ได้"
+    "description": "เคลื่อนที่ไม่ได้ แต่ทำ action ได้",
+    "image": "/images/status/anchored.PNG"
   },
   {
     "id": 8,
     "engName": "fractured",
     "thaiName": "เกราะแตก",
     "stat": "debuff",
-    "description": "ค่า def ลดลง 3"
+    "description": "ค่า def ลดลง 3",
+    "image": "/images/status/fractured.PNG"
   },
   {
     "id": 9,
     "engName": "burn",
     "thaiName": "ถูกเผา",
     "stat": "debuff",
-    "description": "Hp-2 ในเทิร์นถัดไป"
+    "description": "Hp-2 ในเทิร์นถัดไป",
+    "image": "/images/status/burn.PNG"
   },
   {
     "id": 10,
     "engName": "Disoriented",
     "thaiName": "มึนงง",
     "stat": "debuff",
-    "description": "ap -1 ห้ามใช้: Guard, Aid"
+    "description": "ap -1 ห้ามใช้: Guard, Aid",
+    "image": "/images/status/disoriented.PNG"
   },
   {
     "id": 11,
     "engName": "blind",
     "thaiName": "ตาบอด",
     "stat": "debuff",
-    "description": "onHit -2 ห้ามใช้: Overwatch, Aid"
+    "description": "onHit -2 ห้ามใช้: Overwatch, Aid",
+    "image": "/images/status/blind.PNG"
   },
   {
     "id": 12,
     "engName": "frozen",
     "thaiName": "แช่แข็ง",
     "stat": "debuff",
-    "description": "ไม่สามารถทำ action ได้"
+    "description": "ไม่สามารถทำ action ได้",
+    "image": "/images/status/frozen.PNG"
   },
   {
     "id": 13,
     "engName": "bleeding",
     "thaiName": "เลือดไหล",
     "stat": "debuff",
-    "description": "Hp-2 ทุกครั้งที่เคลื่อนที่"
+    "description": "Hp-2 ทุกครั้งที่เคลื่อนที่",
+    "image": "/images/status/bleeding.PNG"
   },
   {
     "id": 14,
     "engName": "silenced",
     "thaiName": "ใบ้",
     "stat": "debuff",
-    "description": "ไม่สามารถใช้ skill ได้"
+    "description": "ไม่สามารถใช้ skill ได้",
+    "image": "/images/status/silenced.PNG"
   },
   {
     "id": 15,
     "engName": "dragon shield",
     "thaiName": "โล่มังกร",
     "stat": "buff",
-    "description": "ได้รับ def -1 หากโดนโจมตีจะสะท้อน 2 damage"
+    "description": "ได้รับ def -1 หากโดนโจมตีจะสะท้อน 2 damage",
+    "image": "/images/status/dragonShield.PNG"
   },
   {
     "id": 16,
     "engName": "Devine light Shield",
     "thaiName": "โล่แห่งแสง",
     "stat": "buff",
-    "description": "ป้องกัน 2 damage"
+    "description": "ป้องกัน 2 damage",
+    "image": "/images/status/devineLightShield.PNG"
   },
   {
     "id": 17,
     "engName": "Shield of TP",
     "thaiName": "โล่แห่งพลังวาป",
     "stat": "buff",
-    "description": "ได้รับ def -1 จากการใช้ teleport"
+    "description": "ได้รับ def -1 จากการใช้ teleport",
+    "image": "/images/status/shieldOfTp.PNG"
   },
   {
     "id": 18,
     "engName": "Melody of Valor",
     "thaiName": "เพลงแห่งความกล้า",
     "stat": "buff",
-    "description": "Hit -3▲ / M +2▲"
+    "description": "Hit -3▲ / M +2▲",
+    "image": "/images/status/melodyOfValor.PNG"
   },
   {
     "id": 19,
     "engName": "Melody of Discord",
     "thaiName": "เพลงแห่งความสับสน",
     "stat": "debuff",
-    "description": "Hit +3▼ / M - 2▼"
+    "description": "Hit +3▼ / M - 2▼",
+    "image": "/images/status/melodyOfDiscord.PNG"
+  },
+  {
+    "id": 20,
+    "engName": "Poisoned",
+    "thaiName": "ติดพิษ",
+    "stat": "debuff",
+    "description": "M -1▼ / Def +1▼ เสีย 1 HP ทุกจบเทิร์น",
+    "image": "/images/status/poisoned.PNG"
+  },
+  {
+    "id": 21,
+    "engName": "Slowed",
+    "thaiName": "ช้า",
+    "stat": "debuff",
+    "description": "move ลดลงครึ่งหนึ่ง",
+    "image": "/images/status/slow.PNG"
+  },
+  {
+    "id": 22,
+    "engName": "Fearful",
+    "thaiName": "หวาดกลัว",
+    "stat": "debuff",
+    "description": "ห้ามใช้ Action Attack ในเทิร์นหน้า",
+    "image": "/images/status/fearful.PNG"
   }
 ]

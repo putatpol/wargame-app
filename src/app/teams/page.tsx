@@ -3,9 +3,11 @@
 import Image from "next/image";
 import characterData from "@/data/character.json";
 import statusBuffs from "@/data/statusBuff.json";
+import raceData from "@/data/race.json";
 import { Character } from "@/interface/character";
 import { useTeam } from "@/context/TeamContext";
 import React from "react";
+import { StatusBuff } from "@/interface/status";
 
 export default function TeamsPage() {
   const characters = characterData as Character[];
@@ -64,6 +66,27 @@ export default function TeamsPage() {
   const getCharacterById = (id: number) =>
     characters.find((char) => char.id === id);
 
+  const getRaceBonus = (characterId: number, statType: string): number => {
+    const character = getCharacterById(characterId);
+    if (!character) return 0;
+
+    if (character.race === "Goliath") {
+      if (statType === "hp") return 3;
+      if (statType === "def") return 1;
+    }
+
+    if (character.race === "Elf") {
+      if (statType === "move") return 1;
+    }
+
+    if (character.race === "Dwarf") {
+      if (statType === "def") return 1;
+      if (statType === "move") return 1;
+    }
+
+    return 0;
+  };
+
   const getStatBoostByType = (
     characterId: number,
     statType: string,
@@ -72,11 +95,14 @@ export default function TeamsPage() {
     const character = getCharacterById(characterId);
     if (!character) return 0;
 
-    if (boost === "move" && statType === "move") return 1;
-    if (boost === "hp" && statType === "hp") return 2;
-    if (boost === "def" && statType === "def") return -1;
-    if (boost === "hiton" && statType === "hiton") return -1;
-    return 0;
+    let humanBoost = 0;
+    if (boost === "move" && statType === "move") humanBoost = 1;
+    if (boost === "hp" && statType === "hp") humanBoost = 2;
+    if (boost === "def" && statType === "def") humanBoost = -1;
+    if (boost === "hiton" && statType === "hiton") humanBoost = -1;
+
+    const raceBonus = getRaceBonus(characterId, statType);
+    return humanBoost + raceBonus;
   };
 
   const getDisplayStat = (characterId: number, statType: string): number => {
@@ -172,7 +198,16 @@ export default function TeamsPage() {
                   <div className="grid grid-cols-2 gap-2 text-sm mb-3">
                     <div>
                       <p className="text-gray-400">Race</p>
-                      <p className="font-semibold">{char.race}</p>
+                      <p className="font-semibold">
+                        <span
+                          title={
+                            raceData.find((r) => r.name === char.race)
+                              ?.description
+                          }
+                        >
+                          {char.race} •
+                        </span>
+                      </p>
                     </div>
                     <div>
                       <p className="text-gray-400">Class</p>
@@ -181,9 +216,13 @@ export default function TeamsPage() {
                     <div>
                       <p className="text-gray-400">HP</p>
                       <p className="font-semibold text-red-400">
-                        {(currentHp?.[char.id] ?? char.status.hp) + getStatBoostByType(char.id, "hp")}
+                        {(currentHp?.[char.id] ?? char.status.hp) +
+                          getStatBoostByType(char.id, "hp")}
                         {characterStatBoost[char.id] === "hp" && (
                           <span className="text-purple-400 ml-1">(+2)</span>
+                        )}
+                        {char.race === "Goliath" && (
+                          <span className="text-orange-400 ml-1">(+3)</span>
                         )}
                       </p>
                     </div>
@@ -196,9 +235,15 @@ export default function TeamsPage() {
                     <div>
                       <p className="text-gray-400">DEF</p>
                       <p className="font-semibold">
-                        {getDisplayStat(char.id, "def")}
+                        {getDisplayStat(char.id, "def")} +
                         {characterStatBoost[char.id] === "def" && (
                           <span className="text-purple-400 ml-1">(-1)</span>
+                        )}
+                        {char.race === "Goliath" && (
+                          <span className="text-orange-400 ml-1">(+1)</span>
+                        )}
+                        {char.race === "Dwarf" && (
+                          <span className="text-orange-400 ml-1">(-1)</span>
                         )}
                       </p>
                     </div>
@@ -208,6 +253,12 @@ export default function TeamsPage() {
                         {getDisplayStat(char.id, "move")}
                         {characterStatBoost[char.id] === "move" && (
                           <span className="text-purple-400 ml-1">(+1)</span>
+                        )}
+                        {char.race === "Elf" && (
+                          <span className="text-orange-400 ml-1">(+1)</span>
+                        )}
+                        {char.race === "Dwarf" && (
+                          <span className="text-orange-400 ml-1">(-1)</span>
                         )}
                       </p>
                     </div>
@@ -224,7 +275,7 @@ export default function TeamsPage() {
                     </p>
                     <div className="space-y-1">
                       <p>
-                        <span>🎯 {getDisplayStat(char.id, "hiton")}+</span>
+                        <span>🎯 {getDisplayStat(char.id, "hiton")} +</span>
                         {characterStatBoost[char.id] === "hiton" && (
                           <span className="text-purple-400 ml-1">(-1)</span>
                         )}
@@ -237,16 +288,19 @@ export default function TeamsPage() {
                   </div>
 
                   {/* Active Statuses */}
-                  {((activeStatusBuffs?.[char.id] ?? []) as number[]).length > 0 && (
+                  {((activeStatusBuffs?.[char.id] ?? []) as number[]).length >
+                    0 && (
                     <div className="mt-3 mb-3">
                       <p className="text-xs text-gray-400 mb-1">Status</p>
                       <div className="flex gap-2 flex-wrap">
                         {(activeStatusBuffs[char.id] ?? []).map((bid) => {
-                          const b = (statusBuffs as any[]).find((s) => s.id === bid);
+                          const b = (statusBuffs as StatusBuff[]).find(
+                            (s) => s.id === bid,
+                          );
                           return (
                             <span
                               key={bid}
-                              title={b.description}
+                              title={b?.description}
                               className="bg-gray-700 text-sm px-2 py-1 rounded flex items-center gap-2"
                             >
                               <span>{b?.thaiName ?? `#${bid}`}</span>
@@ -678,6 +732,7 @@ export default function TeamsPage() {
                     <span className="text-blue-500 text-xl">
                       {(getCharacterById(defenderId)?.status.def ?? 0) +
                         (lightCover ? 2 : 0)}
+                      +
                     </span>
                   </div>
                 )}
@@ -930,7 +985,7 @@ export default function TeamsPage() {
                 className="w-full bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-3 rounded font-semibold transition text-left"
               >
                 <div className="font-bold">Def -1</div>
-                <div className="text-xs text-gray-300">ป้องกันลดลง 1</div>
+                <div className="text-xs text-gray-300">ทอยป้องกันลดลง 1</div>
               </button>
 
               <button
@@ -941,7 +996,7 @@ export default function TeamsPage() {
                 className="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded font-semibold transition text-left"
               >
                 <div className="font-bold">Hit On -1</div>
-                <div className="text-xs text-gray-300">แม่นยำลดลง 1</div>
+                <div className="text-xs text-gray-300">ทอยแม่นยำลดลง 1</div>
               </button>
             </div>
 
@@ -958,9 +1013,13 @@ export default function TeamsPage() {
       {/* Status Buff Modal */}
       {statusModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-gray-800 border-2 border-purple-500 rounded-lg p-6 max-w-lg w-full shadow-xl">
-            <h2 className="text-2xl font-bold text-purple-400 mb-4">เลือกสถานะให้ {statusModal.characterName}</h2>
-            <p className="text-gray-300 mb-4">เลือก action / buff / debuff จากรายการ</p>
+          <div className="bg-gray-800 border-2 border-purple-500 rounded-lg p-6 max-w-xl w-full shadow-xl">
+            <h2 className="text-2xl font-bold text-purple-400 mb-4">
+              เลือกสถานะให้ {statusModal.characterName}
+            </h2>
+            <p className="text-gray-300 mb-4">
+              เลือก action / buff / debuff จากรายการ
+            </p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6 max-h-80 overflow-auto">
               {(statusBuffs as any[]).map((s) => (
@@ -972,8 +1031,28 @@ export default function TeamsPage() {
                   }}
                   className="w-full text-left bg-gray-700 hover:bg-gray-600 px-4 py-3 rounded transition"
                 >
-                  <div className="font-bold text-white">{s.thaiName} <span className="text-xs text-gray-300">({s.engName})</span></div>
-                  <div className="text-xs text-gray-400">{s.description}</div>
+                  <div className="flex gap-2">
+                    <Image
+                      src={s.image}
+                      alt={s.thaiName}
+                      width={32}
+                      height={32}
+                      className="object-contain"
+                    />
+                    <div>
+                      <div className="font-bold text-white">
+                        <div>
+                          {s.thaiName}{" "}
+                          <span className="text-xs text-gray-300">
+                            ({s.engName})
+                          </span>
+                        </div>
+                      </div>
+                      <div className="text-xs text-gray-400">
+                        {s.description}
+                      </div>
+                    </div>
+                  </div>
                 </button>
               ))}
             </div>
