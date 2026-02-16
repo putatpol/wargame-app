@@ -110,25 +110,33 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
 
   // Internal: apply damage without notification (use in performAttack to avoid duplicate notifications)
   const _applyDamageInternal = (characterId: number, damage: number) => {
+    const character = (characterData as Character[]).find(
+      (c) => c.id === characterId,
+    );
+    // Tank reduces incoming damage by 1
+    const actualDamage = character?.role === "Tank" ? Math.max(0, damage - 1) : damage;
+    
     setCurrentHp((prev) => ({
       ...prev,
-      [characterId]: Math.max(0, (prev[characterId] ?? 0) - damage),
+      [characterId]: Math.max(0, (prev[characterId] ?? 0) - actualDamage),
     }));
   };
 
   const applyDamage = (characterId: number, damage: number) => {
     setCurrentHp((prev) => {
-      const prevHp = prev[characterId] ?? 0;
-      const newHp = Math.max(0, prevHp - damage);
-      const updated = { ...prev, [characterId]: newHp };
-
       const character = (characterData as Character[]).find(
         (c) => c.id === characterId,
       );
+      // Tank reduces incoming damage by 1
+      const actualDamage = character?.role === "Tank" ? Math.max(0, damage - 1) : damage;
+      
+      const prevHp = prev[characterId] ?? 0;
+      const newHp = Math.max(0, prevHp - actualDamage);
+      const updated = { ...prev, [characterId]: newHp };
       const name = character?.name || `#${characterId}`;
 
       addNotification(
-        `💥 ${name} รับความเสียหาย ${damage} (HP: ${newHp})`,
+        `💥 ${name} รับความเสียหาย ${actualDamage} (HP: ${newHp})`,
         "info",
       );
 
