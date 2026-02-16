@@ -38,6 +38,7 @@ interface TeamContextType {
     defenderId: number,
     success: boolean,
     damageBonus?: boolean,
+    attackFree?: boolean,
   ) => void;
   endTurn: () => void;
   resetTurn: () => void;
@@ -157,6 +158,7 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
     defenderId: number,
     success: boolean,
     damageBonus: boolean = false,
+    attackFree: boolean = false,
   ) => {
     const characters = characterData as Character[];
     const attacker = characters.find((c) => c.id === attackerId);
@@ -176,7 +178,9 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
     }
 
     // consume AP
-    reduceAp(attackerId, apCost);
+    if (!attackFree) {
+      reduceAp(attackerId, apCost);
+    }
 
     if (success) {
       const dmg = attacker.status.attack?.damage ?? 0;

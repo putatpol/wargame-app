@@ -61,6 +61,7 @@ export default function TeamsPage() {
   const [gangUp, setGangUp] = React.useState(false);
   const [lightCover, setLightCover] = React.useState(false);
   const [counterAttack, setCounterAttack] = React.useState(false);
+  const [attackFree, setAttackFree] = React.useState(false);
   const [selectedSkill, setSelectedSkill] = React.useState<number | null>(null);
   const [statBoostModal, setStatBoostModal] = React.useState<{
     characterId: number;
@@ -456,8 +457,9 @@ export default function TeamsPage() {
                     </div>
                   </div>
 
-                  <div className="flex justify-center mt-2 gap-2">
+                  <div className="flex justify-center mt-2 gap-2 [&_button]:w-20">
                     <button
+                      title="Attack"
                       onClick={() => {
                         if (attackerId === char.id) {
                           setAttackerId(null);
@@ -484,6 +486,7 @@ export default function TeamsPage() {
                     </button>
 
                     <button
+                      title="Defense"
                       onClick={() => {
                         if (defenderId === char.id) {
                           setDefenderId(null);
@@ -507,6 +510,7 @@ export default function TeamsPage() {
                     </button>
 
                     <button
+                      title="Skip"
                       onClick={() => {
                         const apLeft = currentAp?.[char.id] ?? 0;
                         if (apLeft === 0) {
@@ -533,7 +537,7 @@ export default function TeamsPage() {
                         (currentAp?.[char.id] ?? 0) === 0
                       }
                     >
-                      Skip
+                      ⏭
                     </button>
                   </div>
                 </div>
@@ -548,30 +552,32 @@ export default function TeamsPage() {
   return (
     <div className="p-4">
       <div className="max-w-7xl mx-auto  bg-gray-950/75 px-10 py-5 rounded-lg border border-amber-500 shadow-lg">
-        <h1 className="text-4xl font-bold text-amber-400 mb-8 text-center">
-          Let's Battle!
-        </h1>
-
-        <div className="flex items-center justify-between mb-4">
-          <div className="text-sm text-gray-300">
-            Turn:{" "}
-            <span className="font-bold text-black bg-amber-400 rounded-full px-2 py-1">
-              {turnNumber}
-            </span>
-          </div>
-          <div className="flex gap-2">
-            <button
-              onClick={() => endTurn()}
-              className="bg-amber-500 hover:bg-amber-600 text-black px-3 py-1 rounded font-semibold"
-            >
-              End Turn
-            </button>
-            <button
-              onClick={() => resetTurn()}
-              className="bg-red-500 hover:bg-red-600 text-black px-3 py-1 rounded font-semibold"
-            >
-              Reset
-            </button>
+        <div className="grid grid-cols-3 items-center mb-4">
+          <div />
+          <h1 className="text-4xl font-bold text-amber-400 mb-8 text-center">
+            Let's Battle!
+          </h1>
+          <div className="flex gap-2 items-center justify-end">
+            <div className="text-sm text-gray-300">
+              Turn:{" "}
+              <span className="font-bold text-black bg-amber-400 rounded-full px-3 py-1">
+                {turnNumber}
+              </span>
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => endTurn()}
+                className="bg-amber-500 hover:bg-amber-600 text-black px-3 py-1 rounded"
+              >
+                End Turn
+              </button>
+              <button
+                onClick={() => resetTurn()}
+                className="bg-red-500 hover:bg-red-600 text-black px-3 py-1 rounded"
+              >
+                Reset
+              </button>
+            </div>
           </div>
         </div>
 
@@ -628,6 +634,7 @@ export default function TeamsPage() {
                     setGangUp(false);
                     setLightCover(false);
                     setCounterAttack(false);
+                    setAttackFree(false);
                     setSelectedSkill(null);
                   }}
                   className="text-white bg-gray-700 hover:bg-gray-600 rounded px-2 py-1"
@@ -713,7 +720,7 @@ export default function TeamsPage() {
                         : " border border-gray-600 hover:bg-gray-700 text-white"
                     }`}
                   >
-                    {meleeBonus ? "๏ Melee (+4)" : "Melee"}
+                    {meleeBonus ? "⚔︎ Melee (+4)" : "Melee"}
                   </button>
                 )}
               {attackerId &&
@@ -726,7 +733,7 @@ export default function TeamsPage() {
                         : " border border-gray-600 hover:bg-gray-700 text-white"
                     }`}
                   >
-                    {damageBonus ? "๏ Charge (+1)" : "Charge"}
+                    {damageBonus ? "⚡︎ Charge (+1)" : "Charge"}
                   </button>
                 )}
               <button
@@ -737,7 +744,7 @@ export default function TeamsPage() {
                     : " border border-gray-600 hover:bg-gray-700 text-white"
                 }`}
               >
-                {gangUp ? "๏ Gang up (-2)" : "Gang up"}
+                {gangUp ? "⚔︎ Gang (-2)" : "Gang"}
               </button>
               <button
                 onClick={() => setLightCover(!lightCover)}
@@ -747,7 +754,7 @@ export default function TeamsPage() {
                     : " border border-gray-600 hover:bg-gray-700 text-white"
                 }`}
               >
-                {lightCover ? "๏ Covered" : "Cover"}
+                {lightCover ? "⛉ Cover (-2)" : "Cover"}
               </button>
               {defenderId && (
                 <button
@@ -758,9 +765,19 @@ export default function TeamsPage() {
                       : " border border-red-500 hover:bg-red-900/30 text-red-300"
                   }`}
                 >
-                  {counterAttack ? "๏ Counter" : "Counter"}
+                  {counterAttack ? "🗡 Counter" : "Counter"}
                 </button>
               )}
+              <button
+                  onClick={() => setAttackFree(!attackFree)}
+                  className={`w-full px-2 py-1 rounded transition text-xs ${
+                    attackFree
+                      ? "bg-green-600 hover:bg-green-700 text-white"
+                      : " border border-green-500 hover:bg-green-900/30 text-green-300"
+                  }`}
+                >
+                  {attackFree ? "🗡 Free" : "Free"}
+                </button>
             </div>
 
             {/* Skill Selection */}
@@ -878,6 +895,7 @@ export default function TeamsPage() {
                         setDamageBonus(false);
                         setGangUp(false);
                         setLightCover(false);
+                        setAttackFree(false);
                         setSelectedSkill(null);
                       }, 2000);
                       setCardModal(null);
@@ -951,6 +969,7 @@ export default function TeamsPage() {
                         setDamageBonus(false);
                         setGangUp(false);
                         setLightCover(false);
+                        setAttackFree(false);
                         setCounterAttack(false);
                       }, 2000);
                     }}
@@ -983,6 +1002,7 @@ export default function TeamsPage() {
                     defenderId as number,
                     true,
                     damageBonus,
+                    attackFree,
                   );
                   setTimeout(() => {
                     setIsAttacking(false);
@@ -990,6 +1010,7 @@ export default function TeamsPage() {
                     setDamageBonus(false);
                     setGangUp(false);
                     setLightCover(false);
+                    setAttackFree(false);
                   }, 3000);
                 }}
                 className="flex-1 bg-red-600 hover:bg-red-700 disabled:bg-red-900 disabled:opacity-50 text-white px-3 py-2 rounded transition"
@@ -1049,6 +1070,7 @@ export default function TeamsPage() {
                     setDamageBonus(false);
                     setGangUp(false);
                     setLightCover(false);
+                    setAttackFree(false);
                   }, 3000);
                 }}
                 className="flex-1 text-white bg-amber-700 hover:bg-amber-800 disabled:bg-amber-900 disabled:opacity-50 px-3 py-2 rounded transition"
@@ -1081,6 +1103,7 @@ export default function TeamsPage() {
                     setDamageBonus(false);
                     setGangUp(false);
                     setLightCover(false);
+                    setAttackFree(false);
                   }, 3000);
                 }}
                 className="flex-1 bg-gray-600 hover:bg-gray-700 disabled:bg-gray-800 disabled:opacity-50 text-white px-3 py-2 rounded transition"
