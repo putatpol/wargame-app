@@ -434,6 +434,14 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
       [characterId]: [...(prev[characterId] ?? []), buffId],
     }));
 
+    // If the buff is an action, reduce AP by 1
+    if (buff.stat === "action") {
+      setCurrentAp((prev) => ({
+        ...prev,
+        [characterId]: Math.max(0, (prev[characterId] ?? 0) - 1),
+      }));
+    }
+
     addNotification(`✨ ${characterName} ได้รับ ${buff.thaiName}`, "success");
   };
 

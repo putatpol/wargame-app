@@ -20,7 +20,7 @@
     "engName": "aid",
     "thaiName": "ช่วยเหลือ",
     "stat": "action",
-    "description": "ได้รับการช่วยเหลือจากเพื่อน on hit -1",
+    "description": "ให้ความช่วยเหลือเพื่อน on hit -1",
     "image": "/images/status/aid.PNG"
   },
   {
@@ -174,5 +174,13 @@
     "stat": "debuff",
     "description": "ห้ามใช้ Action Attack ในเทิร์นหน้า",
     "image": "/images/status/fearful.PNG"
+  },
+   {
+    "id": 23,
+    "engName": "aided",
+    "thaiName": "ได้รับช่วยเหลือ",
+    "stat": "buff",
+    "description": "รับการช่วยเหลือจากเพื่อน on hit -1",
+    "image": "/images/status/aid.PNG"
   }
 ]
