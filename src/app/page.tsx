@@ -35,7 +35,7 @@ export default function Home() {
       {/* Random Section */}
       <div className="max-w-2xl mx-auto mb-8 bg-gray-800 border border-amber-500 rounded-lg p-6">
         <h2 className="text-2xl font-bold text-amber-400 mb-4">สุ่มตัวละคร</h2>
-        <div className="flex-1 min-w-[150px]">
+        <div className="flex-1 min-w-37.5">
           <label className="block text-sm font-semibold text-gray-300 mb-2">
             จำนวนตัวละครต่อทีม
           </label>

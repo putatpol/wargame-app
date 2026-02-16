@@ -593,9 +593,9 @@ export default function TeamsPage() {
       </div>
 
       {/* Card Modal */}
-      {/* {cardModal && (
+      {cardModal && (
         <CardModal cardModal={cardModal} setCardModal={setCardModal} />
-      )} */}
+      )}
 
       {/* Action Panel (bottom-left) */}
       {actionPanelVisible && (
