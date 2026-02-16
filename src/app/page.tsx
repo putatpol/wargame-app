@@ -5,6 +5,8 @@ import characterData from "../data/character.json";
 import React from "react";
 import { Character } from "@/interface/character";
 import { useTeam } from "@/context/TeamContext";
+import Notification from "@/components/Notification";
+import CardModal from "@/components/CardModal";
 
 export default function Home() {
   const characters = characterData as Character[];
@@ -33,19 +35,19 @@ export default function Home() {
       {/* Random Section */}
       <div className="max-w-2xl mx-auto mb-8 bg-gray-800 border border-amber-500 rounded-lg p-6">
         <h2 className="text-2xl font-bold text-amber-400 mb-4">สุ่มตัวละคร</h2>
-          <div className="flex-1 min-w-[150px]">
-            <label className="block text-sm font-semibold text-gray-300 mb-2">
-              จำนวนตัวละครต่อทีม
-            </label>
-            <input
-              type="number"
-              min="1"
-              max="10"
-              value={randomCount}
-              onChange={(e) => setRandomCount(Math.max(1, parseInt(e.target.value) || 1))}
-              className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded text-white"
-            />
-          </div>
+        <div className="flex-1 min-w-[150px]">
+          <label className="block text-sm font-semibold text-gray-300 mb-2">
+            จำนวนตัวละครต่อทีม
+          </label>
+          <input
+            type="number"
+            min="1"
+            max="10"
+            value={randomCount}
+            onChange={(e) => setRandomCount(Math.max(1, parseInt(e.target.value) || 1))}
+            className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded text-white"
+          />
+        </div>
         <div className="flex gap-4 items-end flex-wrap mt-4 justify-center">
           <button
             onClick={() => addRandomCharacters(randomCount, "A")}
@@ -158,30 +160,26 @@ export default function Home() {
               <button
                 onClick={() => handleTeamClick(char.id, "A")}
                 disabled={isTeamDisabled(char.id, "A")}
-                className={`flex-1 px-4 py-2 rounded text-white font-semibold ${
-                  selectedTeamByCharacter[char.id] === "A"
-                    ? "bg-blue-700"
-                    : "bg-blue-600 hover:bg-blue-700"
-                } ${
-                  isTeamDisabled(char.id, "A")
+                className={`flex-1 px-4 py-2 rounded text-white font-semibold ${selectedTeamByCharacter[char.id] === "A"
+                  ? "bg-blue-700"
+                  : "bg-blue-600 hover:bg-blue-700"
+                  } ${isTeamDisabled(char.id, "A")
                     ? "opacity-50 cursor-not-allowed"
                     : "hover:cursor-pointer"
-                }`}
+                  }`}
               >
                 + A
               </button>
               <button
                 onClick={() => handleTeamClick(char.id, "B")}
                 disabled={isTeamDisabled(char.id, "B")}
-                className={`flex-1 px-4 py-2 rounded text-white font-semibold ${
-                  selectedTeamByCharacter[char.id] === "B"
-                    ? "bg-green-700"
-                    : "bg-green-600 hover:bg-green-700"
-                } ${
-                  isTeamDisabled(char.id, "B")
+                className={`flex-1 px-4 py-2 rounded text-white font-semibold ${selectedTeamByCharacter[char.id] === "B"
+                  ? "bg-green-700"
+                  : "bg-green-600 hover:bg-green-700"
+                  } ${isTeamDisabled(char.id, "B")
                     ? "opacity-50 cursor-not-allowed"
                     : "hover:cursor-pointer"
-                }`}
+                  }`}
               >
                 + B
               </button>
@@ -192,52 +190,11 @@ export default function Home() {
 
       {/* Card Modal */}
       {cardModal && (
-        <div
-          className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50"
-          onClick={() => setCardModal(null)}
-        >
-          <div
-            className="relative max-w-md w-full"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              onClick={() => setCardModal(null)}
-              className="absolute -top-3 -right-3 bg-red-600 hover:bg-red-700 text-white rounded-full w-8 h-8 flex items-center justify-center z-10"
-            >
-              ✕
-            </button>
-            <Image
-              alt={cardModal.characterName}
-              src={cardModal.cardImage}
-              width={400}
-              height={600}
-              className="rounded-lg shadow-2xl"
-              priority
-            />
-            <p className="text-center text-white mt-4 font-semibold">
-              {cardModal.characterName}
-            </p>
-          </div>
-        </div>
+        <CardModal cardModal={cardModal} setCardModal={setCardModal} />
       )}
 
       {/* Notifications */}
-      <div className="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 space-y-2 max-w-md">
-        {notifications.map((notif) => (
-          <div
-            key={notif.id}
-            className={`p-4 rounded-lg text-white shadow-lg animate-fade-in-up ${
-              notif.type === "success"
-                ? "bg-green-600"
-                : notif.type === "error"
-                ? "bg-red-600"
-                : "bg-blue-600"
-            }`}
-          >
-            {notif.message}
-          </div>
-        ))}
-      </div>
+      <Notification notifications={notifications} />
     </div>
   );
 }

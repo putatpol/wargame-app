@@ -8,6 +8,8 @@ import { Character } from "@/interface/character";
 import { useTeam } from "@/context/TeamContext";
 import React from "react";
 import { StatusBuff } from "@/interface/status";
+import Notification from "@/components/Notification";
+import CardModal from "@/components/CardModal";
 
 export default function TeamsPage() {
   const characters = characterData as Character[];
@@ -67,7 +69,7 @@ export default function TeamsPage() {
     characterId: number;
     characterName: string;
   } | null>(null);
-  const [changeBattleAction, setChangeBattleAction] = React.useState(false);
+  const [changeBattleAction, setChangeBattleAction] = React.useState(true);
 
   const getCharacterById = (id: number) =>
     characters.find((char) => char.id === id);
@@ -305,33 +307,33 @@ export default function TeamsPage() {
                   {/* Active Statuses */}
                   {((activeStatusBuffs?.[char.id] ?? []) as number[]).length >
                     0 && (
-                    <div className="mt-3 mb-3">
-                      <p className="text-xs text-gray-400 mb-1">Status</p>
-                      <div className="flex gap-2 flex-wrap">
-                        {(activeStatusBuffs[char.id] ?? []).map((bid) => {
-                          const b = (statusBuffs as StatusBuff[]).find(
-                            (s) => s.id === bid,
-                          );
-                          return (
-                            <span
-                              key={bid}
-                              title={b?.description}
-                              className="bg-gray-700 text-sm px-2 py-1 rounded flex items-center gap-2"
-                            >
-                              <span>{b?.thaiName ?? `#${bid}`}</span>
-                              <button
-                                onClick={() => removeStatusBuff(char.id, bid)}
-                                className="text-xs text-red-400 hover:text-red-200"
-                                aria-label="remove-status"
+                      <div className="mt-3 mb-3">
+                        <p className="text-xs text-gray-400 mb-1">Status</p>
+                        <div className="flex gap-2 flex-wrap">
+                          {(activeStatusBuffs[char.id] ?? []).map((bid) => {
+                            const b = (statusBuffs as StatusBuff[]).find(
+                              (s) => s.id === bid,
+                            );
+                            return (
+                              <span
+                                key={bid}
+                                title={b?.description}
+                                className="bg-gray-700 text-sm px-2 py-1 rounded flex items-center gap-2"
                               >
-                                ✕
-                              </button>
-                            </span>
-                          );
-                        })}
+                                <span>{b?.thaiName ?? `#${bid}`}</span>
+                                <button
+                                  onClick={() => removeStatusBuff(char.id, bid)}
+                                  className="text-xs text-red-400 hover:text-red-200"
+                                  aria-label="remove-status"
+                                >
+                                  ✕
+                                </button>
+                              </span>
+                            );
+                          })}
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
 
                   {/* Buttons */}
                   <div className="flex gap-2 flex-wrap">
@@ -574,33 +576,7 @@ export default function TeamsPage() {
 
       {/* Card Modal */}
       {cardModal && (
-        <div
-          className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50"
-          onClick={() => setCardModal(null)}
-        >
-          <div
-            className="relative max-w-md w-full"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              onClick={() => setCardModal(null)}
-              className="absolute -top-3 -right-3 bg-red-600 hover:bg-red-700 text-white rounded-full w-8 h-8 flex items-center justify-center z-10"
-            >
-              ✕
-            </button>
-            <Image
-              alt={cardModal.characterName}
-              src={cardModal.cardImage}
-              width={400}
-              height={600}
-              className="rounded-lg shadow-2xl"
-              priority
-            />
-            <p className="text-center text-white mt-4 font-semibold">
-              {cardModal.characterName}
-            </p>
-          </div>
-        </div>
+        <CardModal cardModal={cardModal} setCardModal={setCardModal} />
       )}
 
       {/* Action Panel (bottom-left) */}
@@ -700,36 +676,33 @@ export default function TeamsPage() {
             <div className="grid grid-cols-3 gap-2 mb-3">
               {attackerId &&
                 (getCharacterById(attackerId)?.status.attack.range ?? 0) >
-                  1 && (
+                1 && (
                   <button
                     onClick={() => setMeleeBonus(!meleeBonus)}
-                    className={`w-full px-2 py-1 rounded font-semibold transition text-xs ${
-                      meleeBonus
-                        ? "bg-gray-600 hover:bg-gray-700 text-white"
-                        : " border border-gray-600 hover:bg-gray-700 text-white"
-                    }`}
+                    className={`w-full px-2 py-1 rounded font-semibold transition text-xs ${meleeBonus
+                      ? "bg-gray-600 hover:bg-gray-700 text-white"
+                      : " border border-gray-600 hover:bg-gray-700 text-white"
+                      }`}
                   >
                     {meleeBonus ? "๏ Melee +4" : "Melee (+4)"}
                   </button>
                 )}
               <button
                 onClick={() => setLightCover(!lightCover)}
-                className={`w-full px-2 py-1 rounded font-semibold transition text-xs ${
-                  lightCover
-                    ? "bg-gray-600 hover:bg-gray-700 text-white"
-                    : " border border-gray-600 hover:bg-gray-700 text-white"
-                }`}
+                className={`w-full px-2 py-1 rounded font-semibold transition text-xs ${lightCover
+                  ? "bg-gray-600 hover:bg-gray-700 text-white"
+                  : " border border-gray-600 hover:bg-gray-700 text-white"
+                  }`}
               >
                 {lightCover ? "๏ Covered" : "Cover"}
               </button>
               {defenderId && (
                 <button
                   onClick={() => setCounterAttack(!counterAttack)}
-                  className={`w-full px-2 py-1 rounded font-semibold transition text-xs ${
-                    counterAttack
-                      ? "bg-red-600 hover:bg-red-700 text-white"
-                      : " border border-red-500 hover:bg-red-900/30 text-red-300"
-                  }`}
+                  className={`w-full px-2 py-1 rounded font-semibold transition text-xs ${counterAttack
+                    ? "bg-red-600 hover:bg-red-700 text-white"
+                    : " border border-red-500 hover:bg-red-900/30 text-red-300"
+                    }`}
                 >
                   {counterAttack ? "๏ Counter" : "Counter"}
                 </button>
@@ -754,15 +727,13 @@ export default function TeamsPage() {
                             getCharacterById(attackerId)?.name || "Unknown",
                         });
                       }}
-                      className={`px-2 py-1 rounded text-xs font-semibold transition ${
-                        selectedSkill === skill.id
-                          ? "bg-purple-600 hover:bg-purple-700 text-white"
-                          : "border border-purple-500 hover:bg-purple-900/30 text-purple-300"
-                      } ${
-                        (currentAp[attackerId] ?? 0) < skill.ap
+                      className={`px-2 py-1 rounded text-xs font-semibold transition ${selectedSkill === skill.id
+                        ? "bg-purple-600 hover:bg-purple-700 text-white"
+                        : "border border-purple-500 hover:bg-purple-900/30 text-purple-300"
+                        } ${(currentAp[attackerId] ?? 0) < skill.ap
                           ? "opacity-50 cursor-not-allowed"
                           : ""
-                      }`}
+                        }`}
                       disabled={(currentAp[attackerId] ?? 0) < skill.ap}
                       title={`${skill.name} - AP Cost: ${skill.ap}`}
                     >
@@ -1287,22 +1258,7 @@ export default function TeamsPage() {
       )}
 
       {/* Notifications */}
-      <div className="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 space-y-2 max-w-md z-40">
-        {notifications.map((notif) => (
-          <div
-            key={notif.id}
-            className={`p-4 rounded-lg text-white shadow-lg animate-fade-in-up ${
-              notif.type === "success"
-                ? "bg-green-600"
-                : notif.type === "error"
-                  ? "bg-red-600"
-                  : "bg-blue-600"
-            }`}
-          >
-            {notif.message}
-          </div>
-        ))}
-      </div>
+      <Notification notifications={notifications} />
     </div>
   );
 }
