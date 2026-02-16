@@ -37,6 +37,7 @@ interface TeamContextType {
     attackerId: number,
     defenderId: number,
     success: boolean,
+    damageBonus?: boolean,
   ) => void;
   endTurn: () => void;
   resetTurn: () => void;
@@ -155,6 +156,7 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
     attackerId: number,
     defenderId: number,
     success: boolean,
+    damageBonus: boolean = false,
   ) => {
     const characters = characterData as Character[];
     const attacker = characters.find((c) => c.id === attackerId);
@@ -179,12 +181,12 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
     if (success) {
       const dmg = attacker.status.attack?.damage ?? 0;
       // apply damage without showing notification
-      _applyDamageInternal(defenderId, dmg);
+      _applyDamageInternal(defenderId, dmg + (damageBonus ? 1 : 0));
 
       // show single notification with complete information
       const newHp = Math.max(0, (currentHp[defenderId] ?? 0) - dmg);
       addNotification(
-        `⚔️ ${attacker.name} โจมตี → ${defenderName} สำเร็จ! 💥 DMG: ${dmg}`,
+        `⚔️ ${attacker.name} โจมตี → ${defenderName} สำเร็จ! 💥 DMG: ${damageBonus ? dmg + 1 : dmg} `,
         "success",
       );
     } else {

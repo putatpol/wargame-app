@@ -57,7 +57,8 @@ export default function TeamsPage() {
   } | null>(null);
   const [hpAdjustValue, setHpAdjustValue] = React.useState(0);
   const [meleeBonus, setMeleeBonus] = React.useState(false);
-  const [gangUp, setGangUp] = React.useState(false)
+  const [damageBonus, setDamageBonus] = React.useState(false);
+  const [gangUp, setGangUp] = React.useState(false);
   const [lightCover, setLightCover] = React.useState(false);
   const [counterAttack, setCounterAttack] = React.useState(false);
   const [selectedSkill, setSelectedSkill] = React.useState<number | null>(null);
@@ -71,10 +72,15 @@ export default function TeamsPage() {
     characterName: string;
   } | null>(null);
   const [changeBattleAction, setChangeBattleAction] = React.useState(true);
-  const [attackCounts, setAttackCounts] = React.useState<Record<number, number>>({});
+  const [attackCounts, setAttackCounts] = React.useState<
+    Record<number, number>
+  >({});
 
   const incrementAttackCount = (characterId: number) => {
-    setAttackCounts((prev) => ({ ...(prev ?? {}), [characterId]: (prev?.[characterId] ?? 0) + 1 }));
+    setAttackCounts((prev) => ({
+      ...(prev ?? {}),
+      [characterId]: (prev?.[characterId] ?? 0) + 1,
+    }));
   };
 
   const getAttackBonus = (characterId?: number | null) => {
@@ -325,33 +331,33 @@ export default function TeamsPage() {
                   {/* Active Statuses */}
                   {((activeStatusBuffs?.[char.id] ?? []) as number[]).length >
                     0 && (
-                      <div className="mt-3 mb-3">
-                        <p className="text-xs text-gray-400 mb-1">Status</p>
-                        <div className="flex gap-2 flex-wrap">
-                          {(activeStatusBuffs[char.id] ?? []).map((bid) => {
-                            const b = (statusBuffs as StatusBuff[]).find(
-                              (s) => s.id === bid,
-                            );
-                            return (
-                              <span
-                                key={bid}
-                                title={b?.description}
-                                className="bg-gray-700 text-sm px-2 py-1 rounded flex items-center gap-2"
+                    <div className="mt-3 mb-3">
+                      <p className="text-xs text-gray-400 mb-1">Status</p>
+                      <div className="flex gap-2 flex-wrap">
+                        {(activeStatusBuffs[char.id] ?? []).map((bid) => {
+                          const b = (statusBuffs as StatusBuff[]).find(
+                            (s) => s.id === bid,
+                          );
+                          return (
+                            <span
+                              key={bid}
+                              title={b?.description}
+                              className="bg-gray-700 text-sm px-2 py-1 rounded flex items-center gap-2"
+                            >
+                              <span>{b?.thaiName ?? `#${bid}`}</span>
+                              <button
+                                onClick={() => removeStatusBuff(char.id, bid)}
+                                className="text-xs text-red-400 hover:text-red-200"
+                                aria-label="remove-status"
                               >
-                                <span>{b?.thaiName ?? `#${bid}`}</span>
-                                <button
-                                  onClick={() => removeStatusBuff(char.id, bid)}
-                                  className="text-xs text-red-400 hover:text-red-200"
-                                  aria-label="remove-status"
-                                >
-                                  ✕
-                                </button>
-                              </span>
-                            );
-                          })}
-                        </div>
+                                ✕
+                              </button>
+                            </span>
+                          );
+                        })}
                       </div>
-                    )}
+                    </div>
+                  )}
 
                   {/* Buttons */}
                   <div className="flex gap-2 flex-wrap">
@@ -618,6 +624,7 @@ export default function TeamsPage() {
                     setAttackerId(null);
                     setDefenderId(null);
                     setMeleeBonus(false);
+                    setDamageBonus(false);
                     setGangUp(false);
                     setLightCover(false);
                     setCounterAttack(false);
@@ -656,7 +663,8 @@ export default function TeamsPage() {
                     >
                       {getDisplayStat(attackerId, "hiton") +
                         (meleeBonus ? 4 : 0) +
-                        getAttackBonus(attackerId) - (gangUp ? 2 : 0)}
+                        getAttackBonus(attackerId) -
+                        (gangUp ? 2 : 0)}
                       +
                     </span>
                   </div>
@@ -696,42 +704,59 @@ export default function TeamsPage() {
             <div className="grid grid-cols-3 gap-2 mb-3">
               {attackerId &&
                 (getCharacterById(attackerId)?.status.attack.range ?? 0) >
-                1 && (
+                  1 && (
                   <button
                     onClick={() => setMeleeBonus(!meleeBonus)}
-                    className={`w-full px-2 py-1 rounded transition text-xs ${meleeBonus
-                      ? "bg-gray-600 hover:bg-gray-700 text-white"
-                      : " border border-gray-600 hover:bg-gray-700 text-white"
-                      }`}
+                    className={`w-full px-2 py-1 rounded transition text-xs ${
+                      meleeBonus
+                        ? "bg-gray-600 hover:bg-gray-700 text-white"
+                        : " border border-gray-600 hover:bg-gray-700 text-white"
+                    }`}
                   >
                     {meleeBonus ? "๏ Melee (+4)" : "Melee"}
                   </button>
                 )}
+              {attackerId &&
+                getCharacterById(attackerId)?.role === "Vanguard" && (
+                  <button
+                    onClick={() => setDamageBonus(!damageBonus)}
+                    className={`w-full px-2 py-1 rounded transition text-xs ${
+                      damageBonus
+                        ? "bg-gray-600 hover:bg-gray-700 text-white"
+                        : " border border-gray-600 hover:bg-gray-700 text-white"
+                    }`}
+                  >
+                    {damageBonus ? "๏ Charge (+1)" : "Charge"}
+                  </button>
+                )}
               <button
                 onClick={() => setGangUp(!gangUp)}
-                className={`w-full px-2 py-1 rounded transition text-xs ${gangUp
-                  ? "bg-gray-600 hover:bg-gray-700 text-white"
-                  : " border border-gray-600 hover:bg-gray-700 text-white"
-                  }`}
+                className={`w-full px-2 py-1 rounded transition text-xs ${
+                  gangUp
+                    ? "bg-gray-600 hover:bg-gray-700 text-white"
+                    : " border border-gray-600 hover:bg-gray-700 text-white"
+                }`}
               >
-                {gangUp ? "๏ Gang up (-2)" : "Gangup"}
+                {gangUp ? "๏ Gang up (-2)" : "Gang up"}
               </button>
               <button
                 onClick={() => setLightCover(!lightCover)}
-                className={`w-full px-2 py-1 rounded transition text-xs ${lightCover
-                  ? "bg-gray-600 hover:bg-gray-700 text-white"
-                  : " border border-gray-600 hover:bg-gray-700 text-white"
-                  }`}
+                className={`w-full px-2 py-1 rounded transition text-xs ${
+                  lightCover
+                    ? "bg-gray-600 hover:bg-gray-700 text-white"
+                    : " border border-gray-600 hover:bg-gray-700 text-white"
+                }`}
               >
                 {lightCover ? "๏ Covered" : "Cover"}
               </button>
               {defenderId && (
                 <button
                   onClick={() => setCounterAttack(!counterAttack)}
-                  className={`w-full px-2 py-1 rounded transition text-xs ${counterAttack
-                    ? "bg-red-600 hover:bg-red-700 text-white"
-                    : " border border-red-500 hover:bg-red-900/30 text-red-300"
-                    }`}
+                  className={`w-full px-2 py-1 rounded transition text-xs ${
+                    counterAttack
+                      ? "bg-red-600 hover:bg-red-700 text-white"
+                      : " border border-red-500 hover:bg-red-900/30 text-red-300"
+                  }`}
                 >
                   {counterAttack ? "๏ Counter" : "Counter"}
                 </button>
@@ -756,13 +781,15 @@ export default function TeamsPage() {
                         //     getCharacterById(attackerId)?.name || "Unknown",
                         // });
                       }}
-                      className={`px-2 py-1 rounded text-xs font-semibold transition ${selectedSkill === skill.id
-                        ? "bg-purple-600 hover:bg-purple-700 text-white"
-                        : "border border-purple-500 hover:bg-purple-900/30 text-purple-300"
-                        } ${(currentAp[attackerId] ?? 0) < skill.ap
+                      className={`px-2 py-1 rounded text-xs font-semibold transition ${
+                        selectedSkill === skill.id
+                          ? "bg-purple-600 hover:bg-purple-700 text-white"
+                          : "border border-purple-500 hover:bg-purple-900/30 text-purple-300"
+                      } ${
+                        (currentAp[attackerId] ?? 0) < skill.ap
                           ? "opacity-50 cursor-not-allowed"
                           : ""
-                        }`}
+                      }`}
                       disabled={(currentAp[attackerId] ?? 0) < skill.ap}
                       title={`${skill.name} - AP Cost: ${skill.ap}`}
                     >
@@ -780,12 +807,16 @@ export default function TeamsPage() {
             {selectedSkill && attackerId && (
               <div className="mb-3 p-2 bg-purple-900/30 border border-purple-600 rounded">
                 <Image
-                  alt={getCharacterById(attackerId)?.skills.find(
-                    (s) => s.id === selectedSkill,
-                  )?.name || "Skill"}
-                  src={getCharacterById(attackerId)?.skills.find(
-                    (s) => s.id === selectedSkill,
-                  )?.card || ""}
+                  alt={
+                    getCharacterById(attackerId)?.skills.find(
+                      (s) => s.id === selectedSkill,
+                    )?.name || "Skill"
+                  }
+                  src={
+                    getCharacterById(attackerId)?.skills.find(
+                      (s) => s.id === selectedSkill,
+                    )?.card || ""
+                  }
                   width={300}
                   height={600}
                   className="rounded-lg shadow-2xl"
@@ -844,6 +875,7 @@ export default function TeamsPage() {
                       setTimeout(() => {
                         setIsAttacking(false);
                         setMeleeBonus(false);
+                        setDamageBonus(false);
                         setGangUp(false);
                         setLightCover(false);
                         setSelectedSkill(null);
@@ -916,6 +948,7 @@ export default function TeamsPage() {
                       setTimeout(() => {
                         setIsAttacking(false);
                         setMeleeBonus(false);
+                        setDamageBonus(false);
                         setGangUp(false);
                         setLightCover(false);
                         setCounterAttack(false);
@@ -949,10 +982,12 @@ export default function TeamsPage() {
                     attackerId as number,
                     defenderId as number,
                     true,
+                    damageBonus,
                   );
                   setTimeout(() => {
                     setIsAttacking(false);
                     setMeleeBonus(false);
+                    setDamageBonus(false);
                     setGangUp(false);
                     setLightCover(false);
                   }, 3000);
@@ -1011,6 +1046,7 @@ export default function TeamsPage() {
                   setTimeout(() => {
                     setIsAttacking(false);
                     setMeleeBonus(false);
+                    setDamageBonus(false);
                     setGangUp(false);
                     setLightCover(false);
                   }, 3000);
@@ -1037,10 +1073,12 @@ export default function TeamsPage() {
                     attackerId as number,
                     defenderId as number,
                     false,
+                    damageBonus,
                   );
                   setTimeout(() => {
                     setIsAttacking(false);
                     setMeleeBonus(false);
+                    setDamageBonus(false);
                     setGangUp(false);
                     setLightCover(false);
                   }, 3000);
@@ -1059,9 +1097,7 @@ export default function TeamsPage() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
           <div className="bg-gray-800 border-2 border-yellow-500 rounded-lg p-6 max-w-sm w-full shadow-xl">
             <div className="flex justify-between mb-4">
-              <h2 className="text-2xl font-bold text-yellow-400">
-                ปรับ HP
-              </h2>
+              <h2 className="text-2xl font-bold text-yellow-400">ปรับ HP</h2>
               <button
                 className=" text-white bg-gray-600 hover:bg-gray-700 px-2 rounded"
                 onClick={() => {
