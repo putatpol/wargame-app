@@ -750,11 +750,11 @@ export default function TeamsPage() {
                         setSelectedSkill(
                           selectedSkill === skill.id ? null : skill.id,
                         );
-                        setCardModal({
-                          cardImage: skill.card,
-                          characterName:
-                            getCharacterById(attackerId)?.name || "Unknown",
-                        });
+                        // setCardModal({
+                        //   cardImage: skill.card,
+                        //   characterName:
+                        //     getCharacterById(attackerId)?.name || "Unknown",
+                        // });
                       }}
                       className={`px-2 py-1 rounded text-xs font-semibold transition ${selectedSkill === skill.id
                         ? "bg-purple-600 hover:bg-purple-700 text-white"
