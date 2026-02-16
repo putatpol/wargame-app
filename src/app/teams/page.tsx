@@ -76,6 +76,8 @@ export default function TeamsPage() {
   const [attackCounts, setAttackCounts] = React.useState<
     Record<number, number>
   >({});
+  const [score_A, setScore_A] = React.useState(0);
+  const [score_B, setScore_B] = React.useState(0);
 
   const incrementAttackCount = (characterId: number) => {
     setAttackCounts((prev) => ({
@@ -164,12 +166,43 @@ export default function TeamsPage() {
     teamIds: number[],
     teamName: string,
     teamColor: string,
+    score: number,
+    setScore: React.Dispatch<React.SetStateAction<number>>,
   ) => {
     return (
       <div className="mb-8">
-        <h2 className={`text-3xl font-bold mb-4 ${teamColor}`}>
-          ทีม {teamName}
+        <h2
+          className={`text-3xl font-bold mb-4 ${teamColor} flex items-center`}
+        >
+          Team {teamName}{" "}
+          <span className="font-medium text-gray-300 text-sm! flex items-center pl-4">
+            <div
+              className={`w-10 h-10 bg-gray-100 ${teamColor} flex items-center justify-center text-xl font-bold shadow-lg`}
+              style={{
+                clipPath: "polygon(50% 0%, 95% 25%, 80% 90%, 20% 90%, 5% 25%)",
+              }}
+            >
+              {score}
+            </div>
+            <div className="flex flex-col gap-1">
+              <button
+                type="button"
+                onClick={() => setScore(score + 1)}
+                className="px-1 bg-gray-500 hover:bg-gray-600 rounded-sm mx-1"
+              >
+                ▲
+              </button>
+              <button
+                type="button"
+                onClick={() => setScore(score - 1)}
+                className="px-1 bg-gray-500 hover:bg-gray-600 rounded-sm mx-1"
+              >
+                ▼
+              </button>
+            </div>
+          </span>
         </h2>
+
         {teamIds.length === 0 ? (
           <div className="text-gray-400 italic text-center py-8">
             ยังไม่มีตัวละครในทีมนี้
@@ -552,12 +585,12 @@ export default function TeamsPage() {
   return (
     <div className="p-4">
       <div className="max-w-7xl mx-auto  bg-gray-950/75 px-10 py-5 rounded-lg border border-amber-500 shadow-lg">
-        <div className="grid grid-cols-3 items-center mb-4">
+        <div className="grid grid-cols-1 xl:grid-cols-3 items-center mb-4">
           <div />
           <h1 className="text-4xl font-bold text-amber-400 mb-8 text-center">
             Let's Battle!
           </h1>
-          <div className="flex gap-2 items-center justify-end">
+          <div className="flex gap-2 items-center justify-between md:justify-end">
             <div className="text-sm text-gray-300">
               Turn:{" "}
               <span className="font-bold text-black bg-amber-400 rounded-full px-3 py-1">
@@ -582,8 +615,12 @@ export default function TeamsPage() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div>{renderTeam(teamA, "A", "text-blue-400")}</div>
-          <div>{renderTeam(teamB, "B", "text-green-400")}</div>
+          <div>
+            {renderTeam(teamA, "A", "text-blue-400", score_A, setScore_A)}
+          </div>
+          <div>
+            {renderTeam(teamB, "B", "text-green-400", score_B, setScore_B)}
+          </div>
         </div>
 
         {/* Summary */}
@@ -591,12 +628,12 @@ export default function TeamsPage() {
           <h3 className="text-2xl font-bold text-amber-400 mb-4">สรุป</h3>
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-blue-900/30 border border-blue-500 rounded p-4">
-              <p className="text-blue-400 font-semibold">ทีม A</p>
+              <p className="text-blue-400 font-semibold">Team A</p>
               <p className="text-3xl font-bold text-white">{teamA.length}</p>
               <p className="text-sm text-gray-400">ตัวละคร</p>
             </div>
             <div className="bg-green-900/30 border border-green-500 rounded p-4">
-              <p className="text-green-400 font-semibold">ทีม B</p>
+              <p className="text-green-400 font-semibold">Team B</p>
               <p className="text-3xl font-bold text-white">{teamB.length}</p>
               <p className="text-sm text-gray-400">ตัวละคร</p>
             </div>
@@ -614,7 +651,7 @@ export default function TeamsPage() {
         <div
           className={`${changeBattleAction ? "left-4" : "right-4"} fixed bottom-4 z-50`}
         >
-          <div className="bg-gray-800 border border-amber-500 rounded-lg p-4 w-auto max-h-[80vh] overflow-auto shadow-xl">
+          <div className="bg-gray-800 border border-amber-500 rounded-lg p-4 w-full md:w-auto max-h-[80vh] overflow-auto shadow-xl">
             <div className="flex justify-between items-center mb-2">
               <div className="text-sm text-gray-300">Battle Action</div>
               <div className="flex gap-2 text-sm">
@@ -769,15 +806,15 @@ export default function TeamsPage() {
                 </button>
               )}
               <button
-                  onClick={() => setAttackFree(!attackFree)}
-                  className={`w-full px-2 py-1 rounded transition text-xs ${
-                    attackFree
-                      ? "bg-green-600 hover:bg-green-700 text-white"
-                      : " border border-green-500 hover:bg-green-900/30 text-green-300"
-                  }`}
-                >
-                  {attackFree ? "🗡 Free" : "Free"}
-                </button>
+                onClick={() => setAttackFree(!attackFree)}
+                className={`w-full px-2 py-1 rounded transition text-xs ${
+                  attackFree
+                    ? "bg-green-600 hover:bg-green-700 text-white"
+                    : " border border-green-500 hover:bg-green-900/30 text-green-300"
+                }`}
+              >
+                {attackFree ? "🗡 Free" : "Free"}
+              </button>
             </div>
 
             {/* Skill Selection */}

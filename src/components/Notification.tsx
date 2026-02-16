@@ -2,7 +2,7 @@ import { Notification as NotificationType } from '@/context/TeamContext'
 
 const Notification = ({ notifications }: { notifications: NotificationType[] }) => {
     return (
-        <div className="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 space-y-2 max-w-md z-40">
+        <div className="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 space-y-2 max-w-md z-60">
             {notifications.map((notif) => (
                 <div
                     key={notif.id}
