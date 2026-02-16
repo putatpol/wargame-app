@@ -1099,16 +1099,16 @@ export default function TeamsPage() {
 
             <div className="flex gap-2 mb-4">
               <button
-                onClick={() => setHpAdjustValue(hpAdjustValue - 5)}
+                onClick={() => setHpAdjustValue(hpAdjustValue - 3)}
                 className="flex-1 bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded font-semibold"
               >
-                -5
+                -3
               </button>
               <button
-                onClick={() => setHpAdjustValue(hpAdjustValue + 5)}
+                onClick={() => setHpAdjustValue(hpAdjustValue + 3)}
                 className="flex-1 bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded font-semibold"
               >
-                +5
+                +3
               </button>
             </div>
 
