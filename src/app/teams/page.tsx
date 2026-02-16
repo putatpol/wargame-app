@@ -70,6 +70,23 @@ export default function TeamsPage() {
     characterName: string;
   } | null>(null);
   const [changeBattleAction, setChangeBattleAction] = React.useState(true);
+  const [attackCounts, setAttackCounts] = React.useState<Record<number, number>>({});
+
+  const incrementAttackCount = (characterId: number) => {
+    setAttackCounts((prev) => ({ ...(prev ?? {}), [characterId]: (prev?.[characterId] ?? 0) + 1 }));
+  };
+
+  const getAttackBonus = (characterId?: number | null) => {
+    if (characterId == null) return 0;
+    const n = attackCounts[characterId] ?? 0;
+    // each button press increases hit by +2: n presses => +2 * n
+    return 2 * n;
+  };
+
+  // reset attack counts when turn changes
+  React.useEffect(() => {
+    setAttackCounts({});
+  }, [turnNumber]);
 
   const getCharacterById = (id: number) =>
     characters.find((char) => char.id === id);
@@ -636,7 +653,8 @@ export default function TeamsPage() {
                       className={`${getTeamColorClass(attackerId)} text-xl`}
                     >
                       {getDisplayStat(attackerId, "hiton") +
-                        (meleeBonus ? 4 : 0)}
+                        (meleeBonus ? 4 : 0) +
+                        getAttackBonus(attackerId)}
                       +
                     </span>
                   </div>
@@ -900,6 +918,8 @@ export default function TeamsPage() {
                   }
                   setIsAttacking(true);
                   // Normal successful attack (consume AP inside performAttack)
+                  // increment attack count for sequence-based penalty/bonus
+                  incrementAttackCount(attackerId as number);
                   performAttack(
                     attackerId as number,
                     defenderId as number,
@@ -944,6 +964,9 @@ export default function TeamsPage() {
                   // consume AP
                   reduceAp(attackerId, apCost);
 
+                  // increment attack count for sequence-based penalty/bonus
+                  incrementAttackCount(attackerId as number);
+
                   const baseDmg = attacker.status.attack?.damage ?? 0;
                   const critDmg = Math.ceil(baseDmg * 1.5);
 
@@ -981,6 +1004,8 @@ export default function TeamsPage() {
                     return;
                   }
                   setIsAttacking(true);
+                  // increment attack count for sequence-based penalty/bonus
+                  incrementAttackCount(attackerId as number);
                   performAttack(
                     attackerId as number,
                     defenderId as number,
