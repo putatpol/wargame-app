@@ -4,4 +4,15 @@ export interface StatusBuff {
   thaiName: string;
   stat: string;
   description: string;
+  image: string;
+  effect: 
+    {
+      stat: "hitOn" | "atk" | "def" | "move" | "ap"| "hp" | "skill";
+      value: number;
+    }[];
+  resist: {
+    dice: number | null;
+    ap: number | null;
+    turn: number | null;
+  };
 }

@@ -45,7 +45,22 @@
     "thaiName": "ล้ม",
     "stat": "debuff",
     "description": "ถูกผลักล้มลงพื้น ต้องใช้ 1ap ลุกขึ้น",
-    "image": "/images/status/prone.PNG"
+    "image": "/images/status/prone.PNG",
+    "effect": [
+      {
+        "stat": "move",
+        "value": 0
+      },
+      {
+        "stat": "def",
+        "value": 2
+      }
+    ],
+    "resist": {
+      "dice": null,
+      "ap": 1,
+      "turn": null
+    }
   },
   {
     "id": 7,
@@ -53,7 +68,18 @@
     "thaiName": "ถูกล่าม",
     "stat": "debuff",
     "description": "เคลื่อนที่ไม่ได้ แต่ทำ action ได้",
-    "image": "/images/status/anchored.PNG"
+    "image": "/images/status/anchored.PNG",
+    "effect": [
+      {
+        "stat": "move",
+        "value": 0
+      }
+    ],
+    "resist": {
+      "dice": 12,
+      "ap": null,
+      "turn": 1
+    }
   },
   {
     "id": 8,
@@ -61,7 +87,18 @@
     "thaiName": "เกราะแตก",
     "stat": "debuff",
     "description": "ค่า def ลดลง 3",
-    "image": "/images/status/fractured.PNG"
+    "image": "/images/status/fractured.PNG",
+    "effect": [
+      {
+        "stat": "def",
+        "value": 3
+      }
+    ],
+    "resist": {
+      "dice": null,
+      "ap": 10,
+      "turn": 2
+    }
   },
   {
     "id": 9,
@@ -69,7 +106,22 @@
     "thaiName": "ถูกเผา",
     "stat": "debuff",
     "description": "Hp-2 ในเทิร์นถัดไป",
-    "image": "/images/status/burn.PNG"
+    "image": "/images/status/burn.PNG",
+    "effect": [
+      {
+        "stat": "hitOn",
+        "value": 1
+      },
+      {
+        "stat": "def",
+        "value": 1
+      }
+    ],
+    "resist": {
+      "dice": null,
+      "ap": 10,
+      "turn": null
+    }
   },
   {
     "id": 10,
@@ -77,7 +129,18 @@
     "thaiName": "มึนงง",
     "stat": "debuff",
     "description": "ap -1 ห้ามใช้: Guard, Aid",
-    "image": "/images/status/disoriented.PNG"
+    "image": "/images/status/disoriented.PNG",
+    "effect": [
+      {
+        "stat": "ap",
+        "value": -1
+      }
+    ],
+    "resist": {
+      "dice": 10,
+      "ap": null,
+      "turn": 1
+    }
   },
   {
     "id": 11,
@@ -85,7 +148,18 @@
     "thaiName": "ตาบอด",
     "stat": "debuff",
     "description": "onHit -2 ห้ามใช้: Overwatch, Aid",
-    "image": "/images/status/blind.PNG"
+    "image": "/images/status/blind.PNG",
+    "effect": [
+      {
+        "stat": "onHit",
+        "value": -2
+      }
+    ],
+    "resist": {
+      "dice": 12,
+      "ap": null,
+      "turn": null
+    }
   },
   {
     "id": 12,
@@ -93,7 +167,22 @@
     "thaiName": "แช่แข็ง",
     "stat": "debuff",
     "description": "ไม่สามารถทำ action ได้",
-    "image": "/images/status/frozen.PNG"
+    "image": "/images/status/frozen.PNG",
+    "effect": [
+      {
+        "stat": "move",
+        "value": 0
+      },
+      {
+        "stat": "ap",
+        "value": 0
+      }
+    ],
+    "resist": {
+      "dice": 15,
+      "ap": null,
+      "turn": 1
+    }
   },
   {
     "id": 13,
@@ -101,7 +190,18 @@
     "thaiName": "เลือดไหล",
     "stat": "debuff",
     "description": "Hp-2 ทุกครั้งที่เคลื่อนที่",
-    "image": "/images/status/bleeding.PNG"
+    "image": "/images/status/bleeding.PNG",
+    "effect": [
+      {
+        "stat": "hp",
+        "value": -2
+      }
+    ],
+    "resist": {
+      "dice": 10,
+      "ap": 1,
+      "turn": null
+    }
   },
   {
     "id": 14,
@@ -109,7 +209,18 @@
     "thaiName": "ใบ้",
     "stat": "debuff",
     "description": "ไม่สามารถใช้ skill ได้",
-    "image": "/images/status/silenced.PNG"
+    "image": "/images/status/silenced.PNG",
+    "effect": [
+      {
+        "stat": "skill",
+        "value": 0
+      }
+    ],
+    "resist": {
+      "dice": 10,
+      "ap": null,
+      "turn": 1
+    }
   },
   {
     "id": 15,
@@ -157,7 +268,22 @@
     "thaiName": "ติดพิษ",
     "stat": "debuff",
     "description": "M -1▼ / Def +1▼ เสีย 1 HP ทุกจบเทิร์น",
-    "image": "/images/status/poisoned.PNG"
+    "image": "/images/status/poisoned.PNG",
+    "effect": [
+      {
+        "stat": "move",
+        "value": -1
+      },
+      {
+        "stat": "hp",
+        "value": -2
+      }
+    ],
+    "resist": {
+      "dice": 12,
+      "ap": null,
+      "turn": 3
+    }
   },
   {
     "id": 21,
@@ -165,7 +291,18 @@
     "thaiName": "ช้า",
     "stat": "debuff",
     "description": "move ลดลงครึ่งหนึ่ง",
-    "image": "/images/status/slow.PNG"
+    "image": "/images/status/slow.PNG",
+     "effect": [
+      {
+        "stat": "move",
+        "value": 0.5
+      }
+    ],
+    "resist": {
+      "dice": 10,
+      "ap": null,
+      "turn": 2
+    }
   },
   {
     "id": 22,
@@ -173,9 +310,20 @@
     "thaiName": "หวาดกลัว",
     "stat": "debuff",
     "description": "ห้ามใช้ Action Attack ในเทิร์นหน้า",
-    "image": "/images/status/fearful.PNG"
+    "image": "/images/status/fearful.PNG",
+     "effect": [
+      {
+        "stat": "atk",
+        "value": 0
+      }
+    ],
+    "resist": {
+      "dice": 12,
+      "ap": null,
+      "turn": 1
+    }
   },
-   {
+  {
     "id": 23,
     "engName": "aided",
     "thaiName": "ได้รับช่วยเหลือ",
