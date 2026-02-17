@@ -278,7 +278,7 @@ export default function TeamsPage() {
                         <span
                           title={
                             raceData.find((r) => r.name === char.race)
-                              ?.description
+                              ?.description  + (char.resist ? ` [${char.resist}]` : "")
                           }
                         >
                           {char.race} •

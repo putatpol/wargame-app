@@ -1,0 +1,30 @@
+[
+  {
+    "scaleColor": "red",
+    "resistance": "burn"
+  },
+  {
+    "scaleColor": "gold",
+    "resistance": "burn"
+  },
+  {
+    "scaleColor": "white",
+    "resistance": "frozen"
+  },
+  {
+    "scaleColor": "silver",
+    "resistance": "frozen"
+  },
+  {
+    "scaleColor": "blue",
+    "resistance": "lightning"
+  },
+  {
+    "scaleColor": "black",
+    "resistance": "bleeding"
+  },
+  {
+    "scaleColor": "green",
+    "resistance": "poison"
+  }
+]

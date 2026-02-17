@@ -125,7 +125,7 @@
   },
   {
     "id": 10,
-    "engName": "Disoriented",
+    "engName": "disoriented",
     "thaiName": "มึนงง",
     "stat": "debuff",
     "description": "ap -1 ห้ามใช้: Guard, Aid",
@@ -264,7 +264,7 @@
   },
   {
     "id": 20,
-    "engName": "Poisoned",
+    "engName": "poison",
     "thaiName": "ติดพิษ",
     "stat": "debuff",
     "description": "M -1▼ / Def +1▼ เสีย 1 HP ทุกจบเทิร์น",

@@ -3,7 +3,8 @@
     "id": 1,
     "name": "Horakthar",
     "role": "Tank",
-    "race": "Dragonfolk",
+    "race": "Dragonborn",
+    "resist": "burn",
     "class": "Paladin",
     "avatar": "/images/avatar/1.png",
     "status": {
@@ -126,7 +127,8 @@
     "id": 4,
     "name": "Tharvaya",
     "role": "Mage",
-    "race": "Dragonfolk",
+    "race": "Dragonborn",
+    "resist": "poison",
     "class": "Warlock",
     "avatar": "/images/avatar/4.png",
     "status": {

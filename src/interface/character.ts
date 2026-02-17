@@ -29,6 +29,7 @@ export interface Character {
   role: string;
   race: string;
   class: string;
+  resist?: string;
   avatar: string;
   status: {
     ap: number;
