@@ -88,6 +88,8 @@ export default function TeamsPage() {
 
   const getAttackBonus = (characterId?: number | null) => {
     if (characterId == null) return 0;
+    if (attackFree) return 0;
+
     const n = attackCounts[characterId] ?? 0;
     // each button press increases hit by +2: n presses => +2 * n
     return 2 * n;
@@ -278,7 +280,8 @@ export default function TeamsPage() {
                         <span
                           title={
                             raceData.find((r) => r.name === char.race)
-                              ?.description  + (char.resist ? ` [${char.resist}]` : "")
+                              ?.description +
+                            (char.resist ? ` [${char.resist}]` : "")
                           }
                         >
                           {char.race} •
@@ -605,7 +608,10 @@ export default function TeamsPage() {
                 End Turn
               </button>
               <button
-                onClick={() => resetTurn()}
+                onClick={() => {
+                  resetTurn();
+                  setAttackCounts({});
+                }}
                 className="bg-red-500 hover:bg-red-600 text-black px-3 py-1 rounded"
               >
                 Reset
@@ -1020,7 +1026,13 @@ export default function TeamsPage() {
 
             <div className="flex gap-2">
               <button
-                disabled={isAttacking}
+                disabled={
+                  isAttacking ||
+                  (attackerId !== null &&
+                    !attackFree &&
+                    (currentAp[attackerId] ?? 0) <
+                      (getCharacterById(attackerId)?.status.attack.ap ?? 1))
+                }
                 onClick={() => {
                   if (!attackerId || !defenderId) {
                     addNotification("กรุณาเลือกผู้โจมตีและผู้ป้องกัน", "error");
@@ -1071,7 +1083,7 @@ export default function TeamsPage() {
 
                   const apCost = attacker.status.attack?.ap ?? 1;
                   const attackerAp = currentAp[attackerId] ?? 0;
-                  if (attackerAp < apCost) {
+                  if (!attackFree && attackerAp < apCost) {
                     addNotification(
                       `${attacker.name} ไม่มี AP พอสำหรับการโจมตี`,
                       "error",

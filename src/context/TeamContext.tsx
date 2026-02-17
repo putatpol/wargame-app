@@ -43,8 +43,13 @@ interface TeamContextType {
   endTurn: () => void;
   resetTurn: () => void;
   turnNumber: number;
-  characterStatBoost: { [characterId: number]: "move" | "hp" | "def" | "hiton" | null };
-  applyStatBoost: (characterId: number, stat: "move" | "hp" | "def" | "hiton") => void;
+  characterStatBoost: {
+    [characterId: number]: "move" | "hp" | "def" | "hiton" | null;
+  };
+  applyStatBoost: (
+    characterId: number,
+    stat: "move" | "hp" | "def" | "hiton",
+  ) => void;
   activeStatusBuffs: { [characterId: number]: number[] };
   addStatusBuff: (characterId: number, buffId: number) => void;
   removeStatusBuff: (characterId: number, buffId: number) => void;
@@ -59,13 +64,13 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
     [characterId: number]: "A" | "B" | null;
   }>({});
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  
+
   // Helper: Get race bonus for HP
   const getRaceHpBonus = (character: Character): number => {
     if (character.race === "Goliath") return 3;
     return 0;
   };
-  
+
   // init HP map from character data including race bonuses
   const initialHpMap = (characterData as Character[]).reduce(
     (acc, c) => ({ ...acc, [c.id]: c.status.hp + getRaceHpBonus(c) }),
@@ -116,8 +121,9 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
       (c) => c.id === characterId,
     );
     // Tank reduces incoming damage by 1
-    const actualDamage = character?.role === "Tank" ? Math.max(0, damage - 1) : damage;
-    
+    const actualDamage =
+      character?.role === "Tank" ? Math.max(0, damage - 1) : damage;
+
     setCurrentHp((prev) => ({
       ...prev,
       [characterId]: Math.max(0, (prev[characterId] ?? 0) - actualDamage),
@@ -130,8 +136,9 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
         (c) => c.id === characterId,
       );
       // Tank reduces incoming damage by 1
-      const actualDamage = character?.role === "Tank" ? Math.max(0, damage - 1) : damage;
-      
+      const actualDamage =
+        character?.role === "Tank" ? Math.max(0, damage - 1) : damage;
+
       const prevHp = prev[characterId] ?? 0;
       const newHp = Math.max(0, prevHp - actualDamage);
       const updated = { ...prev, [characterId]: newHp };
@@ -172,7 +179,7 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
 
     const apCost = attacker.status.attack?.ap ?? 1;
     const attackerAp = currentAp[attackerId] ?? 0;
-    if (attackerAp < apCost) {
+    if (!attackFree && attackerAp < apCost) {
       addNotification(`${attacker.name} ไม่มี AP พอสำหรับการโจมตี`, "error");
       return;
     }
@@ -219,10 +226,11 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
       addNotification(`ไม่พบตัวละคร ID ${characterId} เพื่อรีเซท HP`, "error");
       return;
     }
-    
+
     // Include HP stat boost if applied
-    const hpWithBoost = characterStatBoost[characterId] === "hp" ? init + 2 : init;
-    
+    const hpWithBoost =
+      characterStatBoost[characterId] === "hp" ? init + 2 : init;
+
     setCurrentHp((prev) => ({ ...prev, [characterId]: hpWithBoost }));
     const character = (characterData as Character[]).find(
       (c) => c.id === characterId,
@@ -245,7 +253,7 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
     if (oldHp !== clampedHp) {
       addNotification(
         `🔧 ปรับเลือด ${characterName}: ${oldHp} → ${clampedHp}`,
-        "info"
+        "info",
       );
     }
 
@@ -299,7 +307,6 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
     } else {
       setTeamB((prev) => prev.filter((id) => id !== characterId));
     }
-
 
     setSelectedTeamByCharacter((prev) => ({
       ...prev,
@@ -385,14 +392,20 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
     setActiveStatusBuffs({});
   };
 
-  const applyStatBoost = (characterId: number, stat: "move" | "hp" | "def" | "hiton") => {
+  const applyStatBoost = (
+    characterId: number,
+    stat: "move" | "hp" | "def" | "hiton",
+  ) => {
     const character = (characterData as Character[]).find(
       (c) => c.id === characterId,
     );
     const characterName = character?.name || `#${characterId}`;
 
     // ตรวจสอบว่าได้เพิ่ม stat ไปแล้วหรือไม่
-    if (characterStatBoost[characterId] !== null && characterStatBoost[characterId] !== undefined) {
+    if (
+      characterStatBoost[characterId] !== null &&
+      characterStatBoost[characterId] !== undefined
+    ) {
       addNotification(
         `${characterName} ได้เพิ่ม stat ไปแล้ว ไม่สามารถเปลี่ยนได้`,
         "error",
@@ -405,7 +418,7 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
       ...prev,
       [characterId]: stat,
     }));
-    
+
     // หากเพิ่ม HP boost ให้เพิ่ม currentHp ด้วย
     if (stat === "hp") {
       setCurrentHp((prev) => ({
@@ -439,7 +452,10 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
     }
     const existing = activeStatusBuffs[characterId] ?? [];
     if (existing.includes(buffId)) {
-      addNotification(`${characterName} มีสถานะ ${buff.thaiName} อยู่แล้ว`, "info");
+      addNotification(
+        `${characterName} มีสถานะ ${buff.thaiName} อยู่แล้ว`,
+        "info",
+      );
       return;
     }
 
@@ -475,7 +491,10 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
       [characterId]: (prev[characterId] ?? []).filter((id) => id !== buffId),
     }));
 
-    addNotification(`🗑️ ลบสถานะ ${buff?.thaiName ?? buffId} จาก ${characterName}`, "info");
+    addNotification(
+      `🗑️ ลบสถานะ ${buff?.thaiName ?? buffId} จาก ${characterName}`,
+      "info",
+    );
   };
 
   return (
