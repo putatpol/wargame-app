@@ -149,7 +149,7 @@
         "hitOn": 8,
         "range": "cone 5",
         "card": "/images/card/4_1.png",
-        "description": "ทำดาเมจ 6 HP และติด [Burn]",
+        "description": "ทำดาเมจ 6 HP และติด [Poisoned]",
         "effect": [
           {
             "id": 1,

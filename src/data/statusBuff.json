@@ -113,7 +113,7 @@
   },
   {
     "id": 15,
-    "engName": "dragon shield",
+    "engName": "Dragon shield",
     "thaiName": "โล่มังกร",
     "stat": "buff",
     "description": "ได้รับ def -1 หากโดนโจมตีจะสะท้อน 2 damage",
