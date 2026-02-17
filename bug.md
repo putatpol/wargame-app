@@ -1,0 +1,5 @@
+- กด free attack, critical, failed แล้ว hit ต้องไม่เพิ่ม [ok]
+- counter ต้องมีปุ่ม critical, fail ด้วย [ok]
+- charge critical ต้องบวก dmg 1 ไปด้วย [ok]
+- การคำนวน ดาเมจ skill
+- หากกดใช้สกิลให้ใช้ hitOn และ damage ของ skill

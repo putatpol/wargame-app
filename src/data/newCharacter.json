@@ -1,0 +1,32 @@
+ {
+    "id": 15,
+    "name": "Oracle",
+    "role": "Mage",
+    "race": "Unknown",
+    "class": "Wizard",
+    "avatar": "/images/avatar/15.png",
+    "status": {
+      "ap": 3,
+      "move": 5,
+      "hp": 12,
+      "def": 15,
+      "attack": {
+        "ap": 1,
+        "hitOn": 10,
+        "range": 10,
+        "damage": 7
+      }
+    },
+    "skills": [
+      {
+        "id": 1,
+        "name": "Dimensional Smoke",
+        "ap": 2,
+        "hitOn": 8,
+        "range": "2",
+        "card": "/images/card/15_1.png",
+        "description": "สร้างพื้นที่ควันมิติรอบตัวศัตรูยิงไม่ได้หากอยู่นอกควัน / หากยืนติดเพื่อน การโจมตีปกติถัดไป ติดคริ (19+) ทันที",
+        "effect": []
+      }
+    ]
+  }
