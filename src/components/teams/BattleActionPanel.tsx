@@ -79,6 +79,20 @@ export default function BattleActionPanel({
   applyDamageInternal,
   onClearCardModal,
 }: BattleActionPanelProps) {
+  const selectedSkillData =
+    attackerId && selectedSkill
+      ? getCharacterById(attackerId)?.skills.find(
+        (skill) => skill.id === selectedSkill,
+      )
+      : undefined;
+
+  const attackerHitOn =
+    attackerId && selectedSkillData
+      ? selectedSkillData.hitOn
+      : attackerId
+        ? getDisplayStat(attackerId, "hiton")
+        : null;
+
   return (
     <div
       className={`${changeBattleAction ? "left-4" : "right-4"} fixed bottom-4 z-50`}
@@ -124,7 +138,7 @@ export default function BattleActionPanel({
               <div className="text-xs text-gray-400">
                 Hit:{" "}
                 <span className={`${getTeamColorClass(attackerId)} text-xl`}>
-                  {getDisplayStat(attackerId, "hiton") +
+                  {(attackerHitOn ?? 0) +
                     (meleeBonus ? 4 : 0) +
                     getAttackBonus(attackerId) -
                     (gangUp ? 2 : 0)}
@@ -166,11 +180,10 @@ export default function BattleActionPanel({
             (getCharacterById(attackerId)?.status.attack.range ?? 0) > 1 && (
               <button
                 onClick={() => setMeleeBonus(!meleeBonus)}
-                className={`w-full px-2 py-1 rounded transition text-xs ${
-                  meleeBonus
+                className={`w-full px-2 py-1 rounded transition text-xs ${meleeBonus
                     ? "bg-gray-600 hover:bg-gray-700 text-white"
                     : " border border-gray-600 hover:bg-gray-700 text-white"
-                }`}
+                  }`}
               >
                 {meleeBonus ? "⚔︎ Melee (+4)" : "Melee"}
               </button>
@@ -179,54 +192,49 @@ export default function BattleActionPanel({
             getCharacterById(attackerId)?.role === "Vanguard" && (
               <button
                 onClick={() => setDamageBonus(!damageBonus)}
-                className={`w-full px-2 py-1 rounded transition text-xs ${
-                  damageBonus
+                className={`w-full px-2 py-1 rounded transition text-xs ${damageBonus
                     ? "bg-gray-600 hover:bg-gray-700 text-white"
                     : " border border-gray-600 hover:bg-gray-700 text-white"
-                }`}
+                  }`}
               >
                 {damageBonus ? "⚡︎ Charge (+1)" : "Charge"}
               </button>
             )}
           <button
             onClick={() => setGangUp(!gangUp)}
-            className={`w-full px-2 py-1 rounded transition text-xs ${
-              gangUp
+            className={`w-full px-2 py-1 rounded transition text-xs ${gangUp
                 ? "bg-gray-600 hover:bg-gray-700 text-white"
                 : " border border-gray-600 hover:bg-gray-700 text-white"
-            }`}
+              }`}
           >
             {gangUp ? "⚔︎ Gang (-2)" : "Gang"}
           </button>
           <button
             onClick={() => setLightCover(!lightCover)}
-            className={`w-full px-2 py-1 rounded transition text-xs ${
-              lightCover
+            className={`w-full px-2 py-1 rounded transition text-xs ${lightCover
                 ? "bg-gray-600 hover:bg-gray-700 text-white"
                 : " border border-gray-600 hover:bg-gray-700 text-white"
-            }`}
+              }`}
           >
             {lightCover ? "⛉ Cover (-2)" : "Cover"}
           </button>
           {defenderId && (
             <button
               onClick={() => setCounterAttack(!counterAttack)}
-              className={`w-full px-2 py-1 rounded transition text-xs ${
-                counterAttack
+              className={`w-full px-2 py-1 rounded transition text-xs ${counterAttack
                   ? "bg-red-600 hover:bg-red-700 text-white"
                   : " border border-red-500 hover:bg-red-900/30 text-red-300"
-              }`}
+                }`}
             >
               {counterAttack ? "🗡 Counter" : "Counter"}
             </button>
           )}
           <button
             onClick={() => setAttackFree(!attackFree)}
-            className={`w-full px-2 py-1 rounded transition text-xs ${
-              attackFree
+            className={`w-full px-2 py-1 rounded transition text-xs ${attackFree
                 ? "bg-green-600 hover:bg-green-700 text-white"
                 : " border border-green-500 hover:bg-green-900/30 text-green-300"
-            }`}
+              }`}
           >
             {attackFree ? "🗡 Free" : "Free"}
           </button>
@@ -245,15 +253,13 @@ export default function BattleActionPanel({
                       selectedSkill === skill.id ? null : skill.id,
                     );
                   }}
-                  className={`px-2 py-1 rounded text-xs font-semibold transition ${
-                    selectedSkill === skill.id
-                      ? "bg-purple-600 hover:bg-purple-700 text-white"
-                      : "border border-purple-500 hover:bg-purple-900/30 text-purple-300"
-                  } ${
-                    (currentAp?.[attackerId] ?? 0) < skill.ap
+                  className={`px-2 py-1 rounded text-xs font-semibold transition ${selectedSkill === skill.id
+                    ? "bg-purple-600 hover:bg-purple-700 text-white"
+                    : "border border-purple-500 hover:bg-purple-900/30 text-purple-300"
+                    } ${(currentAp?.[attackerId] ?? 0) < skill.ap
                       ? "opacity-50 cursor-not-allowed"
                       : ""
-                  }`}
+                    }`}
                   disabled={(currentAp?.[attackerId] ?? 0) < skill.ap}
                   title={`${skill.name} - AP Cost: ${skill.ap}`}
                 >
@@ -483,7 +489,7 @@ export default function BattleActionPanel({
                 (attackerId !== null &&
                   !attackFree &&
                   (currentAp?.[attackerId] ?? 0) <
-                    (getCharacterById(attackerId)?.status.attack.ap ?? 1))
+                  (getCharacterById(attackerId)?.status.attack.ap ?? 1))
               }
               onClick={() => {
                 if (!attackerId || !defenderId) {
