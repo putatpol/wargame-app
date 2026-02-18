@@ -32,7 +32,7 @@
   {
     "id": 7,
     "name": "Goliath",
-    "description": "HP +3 แต่ Def -1 และไม่ถูกผลักกระเด็น"
+    "description": "HP +3 แต่ Def +1 และไม่ถูกผลักกระเด็น"
   },
   {
     "id": 8,
