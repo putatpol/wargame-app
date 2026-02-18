@@ -79,7 +79,22 @@ export default function TeamsPage() {
   const [score_A, setScore_A] = React.useState(0);
   const [score_B, setScore_B] = React.useState(0);
 
+  const isAttackDisabledByBuff = (characterId: number): boolean => {
+    const buffs = activeStatusBuffs[characterId];
+    if (!buffs || buffs.length === 0) {
+      return false;
+    }
+
+    const disablingBuffEngNames = ["fearful", "frozen", "prone"];
+
+    return buffs.some((buffId) => {
+      const buff = statusBuffs.find((b) => b.id === buffId);
+      return buff ? disablingBuffEngNames.includes(buff.engName) : false;
+    });
+  };
+
   const incrementAttackCount = (characterId: number) => {
+    if (attackFree) return;
     setAttackCounts((prev) => ({
       ...(prev ?? {}),
       [characterId]: (prev?.[characterId] ?? 0) + 1,
@@ -515,7 +530,8 @@ export default function TeamsPage() {
                       className="border border-amber-500 hover:bg-amber-600 disabled:opacity-50 disabled:cursor-not-allowed text-black px-4 py-2 rounded font-semibold"
                       disabled={
                         (currentHp?.[char.id] ?? char.status.hp) === 0 ||
-                        (currentAp?.[char.id] ?? 0) === 0
+                        (currentAp?.[char.id] ?? 0) === 0 ||
+                        isAttackDisabledByBuff(char.id)
                       }
                     >
                       ⚔️
@@ -882,7 +898,7 @@ export default function TeamsPage() {
                   className="rounded-lg shadow-2xl"
                   priority
                 />
-                <p className="text-xs text-purple-300 mb-2">
+                <p className="text-xs text-purple-300 my-2">
                   {getCharacterById(attackerId)?.skills.find(
                     (s) => s.id === selectedSkill,
                   )?.name || "Skill"}{" "}
@@ -952,7 +968,7 @@ export default function TeamsPage() {
             )}
 
             {/* Counter Attack Confirmation */}
-            {counterAttack && attackerId && defenderId && (
+            {counterAttack && attackerId && defenderId ? (
               <div className="mb-3 p-2 bg-red-900/30 border border-red-600 rounded">
                 <p className="text-xs text-red-300 mb-2">
                   ✓ {getCharacterById(defenderId)?.name} จะโจมตีกลับ (AP ไม่ลด)
@@ -1016,150 +1032,228 @@ export default function TeamsPage() {
                         setCounterAttack(false);
                       }, 2000);
                     }}
-                    className="flex-1 bg-red-600 hover:bg-red-700 disabled:bg-red-900 disabled:opacity-50 text-white px-3 py-2 rounded transition text-sm font-semibold"
+                    className="flex-1 bg-red-600 hover:bg-red-700 disabled:bg-red-900 disabled:opacity-50 text-white px-3 py-1 rounded transition text-sm font-semibold"
                   >
-                    โจมตีกลับ
+                    Counter <br /> Attack
+                  </button>
+                  <button
+                    disabled={isAttacking}
+                    onClick={() => {
+                      if (!attackerId || !defenderId) {
+                        addNotification(
+                          "กรุณาเลือกผู้โจมตีและผู้ป้องกัน",
+                          "error",
+                        );
+                        return;
+                      }
+                      setIsAttacking(true);
+                      const defender = getCharacterById(defenderId);
+                      const attacker = getCharacterById(attackerId);
+                      const baseDmg = defender?.status.attack.damage ?? 0;
+                      const critDmg = Math.ceil(baseDmg * 1.5);
+                      const currentCharHp = currentHp[attackerId] ?? 0;
+                      const newHp = Math.max(0, currentCharHp - critDmg);
+
+                      _applyDamageInternal(attackerId, critDmg);
+
+                      addNotification(
+                        `⚡ ${defender?.name} โจมตีกลับ Critical! 💥 DMG: ${critDmg} (HP: ${newHp})`,
+                        "success",
+                      );
+
+                      setTimeout(() => {
+                        setIsAttacking(false);
+                        setCounterAttack(false);
+                      }, 2000);
+                    }}
+                    className="flex-1 text-white bg-amber-700 hover:bg-amber-800 disabled:bg-amber-900 disabled:opacity-50 px-3 py-1 rounded transition text-sm font-semibold"
+                  >
+                    Counter <br /> Critical
+                  </button>
+                  <button
+                    disabled={isAttacking}
+                    onClick={() => {
+                      if (!attackerId || !defenderId) {
+                        addNotification(
+                          "กรุณาเลือกผู้โจมตีและผู้ป้องกัน",
+                          "error",
+                        );
+                        return;
+                      }
+                      setIsAttacking(true);
+                      const defender = getCharacterById(defenderId);
+                      const attacker = getCharacterById(attackerId);
+
+                      addNotification(
+                        `⚡ ${defender?.name} โจมตีกลับ ${attacker?.name} พลาด!`,
+                        "info",
+                      );
+
+                      setTimeout(() => {
+                        setIsAttacking(false);
+                        setCounterAttack(false);
+                      }, 2000);
+                    }}
+                    className="flex-1 bg-gray-600 hover:bg-gray-700 disabled:bg-gray-800 disabled:opacity-50 text-white px-3 py-1 rounded transition text-sm font-semibold"
+                  >
+                    Counter <br /> Failed
                   </button>
                 </div>
               </div>
+            ) : (
+              <>
+                <div className="flex gap-2">
+                  <button
+                    disabled={
+                      isAttacking ||
+                      (attackerId !== null &&
+                        !attackFree &&
+                        (currentAp[attackerId] ?? 0) <
+                          (getCharacterById(attackerId)?.status.attack.ap ?? 1))
+                    }
+                    onClick={() => {
+                      if (!attackerId || !defenderId) {
+                        addNotification(
+                          "กรุณาเลือกผู้โจมตีและผู้ป้องกัน",
+                          "error",
+                        );
+                        return;
+                      }
+                      if (attackerId === defenderId) {
+                        addNotification("ไม่สามารถโจมตีตัวเองได้", "error");
+                        return;
+                      }
+                      setIsAttacking(true);
+                      // Normal successful attack (consume AP inside performAttack)
+                      // increment attack count for sequence-based penalty/bonus
+                      incrementAttackCount(attackerId as number);
+                      performAttack(
+                        attackerId as number,
+                        defenderId as number,
+                        true,
+                        damageBonus,
+                        attackFree,
+                      );
+                      setTimeout(() => {
+                        setIsAttacking(false);
+                        setMeleeBonus(false);
+                        setDamageBonus(false);
+                        setGangUp(false);
+                        setLightCover(false);
+                        setAttackFree(false);
+                      }, 3000);
+                    }}
+                    className="flex-1 bg-red-600 hover:bg-red-700 disabled:bg-red-900 disabled:opacity-50 text-white px-3 py-2 rounded transition"
+                  >
+                    Attack
+                  </button>
+                  <button
+                    disabled={isAttacking}
+                    onClick={() => {
+                      if (!attackerId || !defenderId) {
+                        addNotification(
+                          "กรุณาเลือกผู้โจมตีและผู้ป้องกัน",
+                          "error",
+                        );
+                        return;
+                      }
+                      if (attackerId === defenderId) {
+                        addNotification("ไม่สามารถโจมตีตัวเองได้", "error");
+                        return;
+                      }
+
+                      const attacker = getCharacterById(attackerId);
+                      if (!attacker) return;
+
+                      const apCost = attacker.status.attack?.ap ?? 1;
+                      const attackerAp = currentAp[attackerId] ?? 0;
+                      if (!attackFree && attackerAp < apCost) {
+                        addNotification(
+                          `${attacker.name} ไม่มี AP พอสำหรับการโจมตี`,
+                          "error",
+                        );
+                        return;
+                      }
+
+                      setIsAttacking(true);
+                      // consume AP
+                      reduceAp(attackerId, apCost);
+                      if (!attackFree) {
+                        reduceAp(attackerId, apCost);
+                      }
+
+                      // increment attack count for sequence-based penalty/bonus
+                      incrementAttackCount(attackerId as number);
+
+                      const baseDmg = attacker.status.attack?.damage ?? 0;
+                      const critDmg =
+                        Math.ceil(baseDmg * 1.5) + (damageBonus ? 1 : 0);
+
+                      // apply damage without duplicate notification
+                      _applyDamageInternal(defenderId, critDmg);
+
+                      const newHp = Math.max(
+                        0,
+                        (currentHp[defenderId] ?? 0) - critDmg,
+                      );
+                      addNotification(
+                        `💥 ${attacker.name} โจมตีแบบ Critical → ${getCharacterById(defenderId)?.name}! DMG: ${critDmg} (HP: ${newHp})`,
+                        "success",
+                      );
+
+                      setTimeout(() => {
+                        setIsAttacking(false);
+                        setMeleeBonus(false);
+                        setDamageBonus(false);
+                        setGangUp(false);
+                        setLightCover(false);
+                        setAttackFree(false);
+                      }, 3000);
+                    }}
+                    className="flex-1 text-white bg-amber-700 hover:bg-amber-800 disabled:bg-amber-900 disabled:opacity-50 px-3 py-2 rounded transition"
+                  >
+                    Critical
+                  </button>
+                  <button
+                    disabled={isAttacking}
+                    onClick={() => {
+                      if (!attackerId || !defenderId) {
+                        addNotification(
+                          "กรุณาเลือกผู้โจมตีและผู้ป้องกัน",
+                          "error",
+                        );
+                        return;
+                      }
+                      if (attackerId === defenderId) {
+                        addNotification("ไม่สามารถโจมตีตัวเองได้", "error");
+                        return;
+                      }
+                      setIsAttacking(true);
+                      // increment attack count for sequence-based penalty/bonus
+                      incrementAttackCount(attackerId as number);
+                      performAttack(
+                        attackerId as number,
+                        defenderId as number,
+                        false,
+                        damageBonus,
+                        attackFree,
+                      );
+                      setTimeout(() => {
+                        setIsAttacking(false);
+                        setMeleeBonus(false);
+                        setDamageBonus(false);
+                        setGangUp(false);
+                        setLightCover(false);
+                        setAttackFree(false);
+                      }, 3000);
+                    }}
+                    className="flex-1 bg-gray-600 hover:bg-gray-700 disabled:bg-gray-800 disabled:opacity-50 text-white px-3 py-2 rounded transition"
+                  >
+                    Failed
+                  </button>
+                </div>
+              </>
             )}
-
-            <div className="flex gap-2">
-              <button
-                disabled={
-                  isAttacking ||
-                  (attackerId !== null &&
-                    !attackFree &&
-                    (currentAp[attackerId] ?? 0) <
-                      (getCharacterById(attackerId)?.status.attack.ap ?? 1))
-                }
-                onClick={() => {
-                  if (!attackerId || !defenderId) {
-                    addNotification("กรุณาเลือกผู้โจมตีและผู้ป้องกัน", "error");
-                    return;
-                  }
-                  if (attackerId === defenderId) {
-                    addNotification("ไม่สามารถโจมตีตัวเองได้", "error");
-                    return;
-                  }
-                  setIsAttacking(true);
-                  // Normal successful attack (consume AP inside performAttack)
-                  // increment attack count for sequence-based penalty/bonus
-                  incrementAttackCount(attackerId as number);
-                  performAttack(
-                    attackerId as number,
-                    defenderId as number,
-                    true,
-                    damageBonus,
-                    attackFree,
-                  );
-                  setTimeout(() => {
-                    setIsAttacking(false);
-                    setMeleeBonus(false);
-                    setDamageBonus(false);
-                    setGangUp(false);
-                    setLightCover(false);
-                    setAttackFree(false);
-                  }, 3000);
-                }}
-                className="flex-1 bg-red-600 hover:bg-red-700 disabled:bg-red-900 disabled:opacity-50 text-white px-3 py-2 rounded transition"
-              >
-                Attack
-              </button>
-              <button
-                disabled={isAttacking}
-                onClick={() => {
-                  if (!attackerId || !defenderId) {
-                    addNotification("กรุณาเลือกผู้โจมตีและผู้ป้องกัน", "error");
-                    return;
-                  }
-                  if (attackerId === defenderId) {
-                    addNotification("ไม่สามารถโจมตีตัวเองได้", "error");
-                    return;
-                  }
-
-                  const attacker = getCharacterById(attackerId);
-                  if (!attacker) return;
-
-                  const apCost = attacker.status.attack?.ap ?? 1;
-                  const attackerAp = currentAp[attackerId] ?? 0;
-                  if (!attackFree && attackerAp < apCost) {
-                    addNotification(
-                      `${attacker.name} ไม่มี AP พอสำหรับการโจมตี`,
-                      "error",
-                    );
-                    return;
-                  }
-
-                  setIsAttacking(true);
-                  // consume AP
-                  reduceAp(attackerId, apCost);
-
-                  // increment attack count for sequence-based penalty/bonus
-                  incrementAttackCount(attackerId as number);
-
-                  const baseDmg = attacker.status.attack?.damage ?? 0;
-                  const critDmg = Math.ceil(baseDmg * 1.5);
-
-                  // apply damage without duplicate notification
-                  _applyDamageInternal(defenderId, critDmg);
-
-                  const newHp = Math.max(
-                    0,
-                    (currentHp[defenderId] ?? 0) - critDmg,
-                  );
-                  addNotification(
-                    `💥 ${attacker.name} โจมตีแบบ Critical → ${getCharacterById(defenderId)?.name}! DMG: ${critDmg} (HP: ${newHp})`,
-                    "success",
-                  );
-
-                  setTimeout(() => {
-                    setIsAttacking(false);
-                    setMeleeBonus(false);
-                    setDamageBonus(false);
-                    setGangUp(false);
-                    setLightCover(false);
-                    setAttackFree(false);
-                  }, 3000);
-                }}
-                className="flex-1 text-white bg-amber-700 hover:bg-amber-800 disabled:bg-amber-900 disabled:opacity-50 px-3 py-2 rounded transition"
-              >
-                Critical
-              </button>
-              <button
-                disabled={isAttacking}
-                onClick={() => {
-                  if (!attackerId || !defenderId) {
-                    addNotification("กรุณาเลือกผู้โจมตีและผู้ป้องกัน", "error");
-                    return;
-                  }
-                  if (attackerId === defenderId) {
-                    addNotification("ไม่สามารถโจมตีตัวเองได้", "error");
-                    return;
-                  }
-                  setIsAttacking(true);
-                  // increment attack count for sequence-based penalty/bonus
-                  incrementAttackCount(attackerId as number);
-                  performAttack(
-                    attackerId as number,
-                    defenderId as number,
-                    false,
-                    damageBonus,
-                  );
-                  setTimeout(() => {
-                    setIsAttacking(false);
-                    setMeleeBonus(false);
-                    setDamageBonus(false);
-                    setGangUp(false);
-                    setLightCover(false);
-                    setAttackFree(false);
-                  }, 3000);
-                }}
-                className="flex-1 bg-gray-600 hover:bg-gray-700 disabled:bg-gray-800 disabled:opacity-50 text-white px-3 py-2 rounded transition"
-              >
-                Failed
-              </button>
-            </div>
           </div>
         </div>
       )}
