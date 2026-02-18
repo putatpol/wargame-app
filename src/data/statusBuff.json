@@ -41,45 +41,19 @@
   },
   {
     "id": 6,
-    "engName": "prone",
-    "thaiName": "ล้ม",
-    "stat": "debuff",
-    "description": "ถูกผลักล้มลงพื้น ต้องใช้ 1ap ลุกขึ้น",
-    "image": "/images/status/prone.PNG",
-    "effect": [
-      {
-        "stat": "move",
-        "value": 0
-      },
-      {
-        "stat": "def",
-        "value": 2
-      }
-    ],
-    "resist": {
-      "dice": null,
-      "ap": 1,
-      "turn": null
-    }
+    "engName": "run",
+    "thaiName": "วิ่ง",
+    "stat": "action",
+    "description": "เคลื่อนที่เพิ่มได้ 3 ช่อง",
+    "image": "/images/status/run.PNG"
   },
   {
     "id": 7,
-    "engName": "anchored",
-    "thaiName": "ถูกล่าม",
-    "stat": "debuff",
-    "description": "เคลื่อนที่ไม่ได้ แต่ทำ action ได้",
-    "image": "/images/status/anchored.PNG",
-    "effect": [
-      {
-        "stat": "move",
-        "value": 0
-      }
-    ],
-    "resist": {
-      "dice": 12,
-      "ap": null,
-      "turn": 1
-    }
+    "engName": "objective",
+    "thaiName": "ทำภารกิจ",
+    "stat": "action",
+    "description": "ทำภารกิจที่ได้รับมอบหมาย",
+    "image": "/images/status/objective.PNG"
   },
   {
     "id": 8,
@@ -222,8 +196,27 @@
       "turn": 1
     }
   },
-  {
+   {
     "id": 15,
+    "engName": "anchored",
+    "thaiName": "ถูกล่าม",
+    "stat": "debuff",
+    "description": "เคลื่อนที่ไม่ได้ แต่ทำ action ได้",
+    "image": "/images/status/anchored.PNG",
+    "effect": [
+      {
+        "stat": "move",
+        "value": 0
+      }
+    ],
+    "resist": {
+      "dice": 12,
+      "ap": null,
+      "turn": 1
+    }
+  },
+  {
+    "id": 16,
     "engName": "Dragon shield",
     "thaiName": "โล่มังกร",
     "stat": "buff",
@@ -231,7 +224,7 @@
     "image": "/images/status/dragonShield.PNG"
   },
   {
-    "id": 16,
+    "id": 17,
     "engName": "Devine light Shield",
     "thaiName": "โล่แห่งแสง",
     "stat": "buff",
@@ -239,7 +232,7 @@
     "image": "/images/status/devineLightShield.PNG"
   },
   {
-    "id": 17,
+    "id": 18,
     "engName": "Shield of TP",
     "thaiName": "โล่แห่งพลังวาป",
     "stat": "buff",
@@ -247,7 +240,7 @@
     "image": "/images/status/shieldOfTp.PNG"
   },
   {
-    "id": 18,
+    "id": 19,
     "engName": "Melody of Valor",
     "thaiName": "เพลงแห่งความกล้า",
     "stat": "buff",
@@ -255,7 +248,7 @@
     "image": "/images/status/melodyOfValor.PNG"
   },
   {
-    "id": 19,
+    "id": 20,
     "engName": "Melody of Discord",
     "thaiName": "เพลงแห่งความสับสน",
     "stat": "debuff",
@@ -263,7 +256,7 @@
     "image": "/images/status/melodyOfDiscord.PNG"
   },
   {
-    "id": 20,
+    "id": 21,
     "engName": "poison",
     "thaiName": "ติดพิษ",
     "stat": "debuff",
@@ -286,7 +279,7 @@
     }
   },
   {
-    "id": 21,
+    "id": 22,
     "engName": "Slowed",
     "thaiName": "ช้า",
     "stat": "debuff",
@@ -305,7 +298,7 @@
     }
   },
   {
-    "id": 22,
+    "id": 23,
     "engName": "Fearful",
     "thaiName": "หวาดกลัว",
     "stat": "debuff",
@@ -324,11 +317,34 @@
     }
   },
   {
-    "id": 23,
+    "id": 24,
     "engName": "aided",
     "thaiName": "ได้รับช่วยเหลือ",
     "stat": "buff",
     "description": "รับการช่วยเหลือจากเพื่อน on hit -1",
     "image": "/images/status/aid.PNG"
+  },
+  {
+    "id": 25,
+    "engName": "prone",
+    "thaiName": "ล้ม",
+    "stat": "debuff",
+    "description": "ถูกผลักล้มลงพื้น ต้องใช้ 1ap ลุกขึ้น",
+    "image": "/images/status/prone.PNG",
+    "effect": [
+      {
+        "stat": "move",
+        "value": 0
+      },
+      {
+        "stat": "def",
+        "value": 2
+      }
+    ],
+    "resist": {
+      "dice": null,
+      "ap": 1,
+      "turn": null
+    }
   }
 ]

@@ -332,7 +332,7 @@ export default function TeamSection({
                                                     onClick={() => onOpenStatusModal(char)}
                                                     className="w-full text-left px-4 py-2 hover:bg-gray-700"
                                                 >
-                                                    ➕ เติมสถานะ
+                                                    ➕ สถานะ
                                                 </button>
                                                 <button
                                                     onClick={() =>
