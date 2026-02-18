@@ -419,6 +419,7 @@ export default function TeamsPage() {
           getAttackBonus={getAttackBonus}
           currentAp={currentAp}
           currentHp={currentHp}
+          turnNumber={turnNumber}
           meleeBonus={meleeBonus}
           setMeleeBonus={setMeleeBonus}
           damageBonus={damageBonus}

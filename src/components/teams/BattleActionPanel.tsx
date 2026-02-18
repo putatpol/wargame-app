@@ -14,6 +14,7 @@ type BattleActionPanelProps = {
   getAttackBonus: (characterId?: number | null) => number;
   currentAp: Record<number, number> | undefined;
   currentHp: Record<number, number> | undefined;
+  turnNumber: number;
   meleeBonus: boolean;
   setMeleeBonus: (value: boolean) => void;
   damageBonus: boolean;
@@ -30,7 +31,10 @@ type BattleActionPanelProps = {
   setSelectedSkill: (value: number | null) => void;
   isAttacking: boolean;
   setIsAttacking: (value: boolean) => void;
-  addNotification: (message: string, type: "info" | "error" | "success") => void;
+  addNotification: (
+    message: string,
+    type: "info" | "error" | "success",
+  ) => void;
   reduceAp: (characterId: number, amount: number) => void;
   performAttack: (
     attackerId: number,
@@ -78,12 +82,18 @@ export default function BattleActionPanel({
   incrementAttackCount,
   applyDamageInternal,
   onClearCardModal,
+  turnNumber,
 }: BattleActionPanelProps) {
+  const [assistUsed, setAssistUsed] = React.useState(false);
+
+  React.useEffect(() => {
+    setAssistUsed(false);
+  }, [turnNumber]);
   const selectedSkillData =
     attackerId && selectedSkill
       ? getCharacterById(attackerId)?.skills.find(
-        (skill) => skill.id === selectedSkill,
-      )
+          (skill) => skill.id === selectedSkill,
+        )
       : undefined;
 
   const attackerHitOn =
@@ -180,61 +190,66 @@ export default function BattleActionPanel({
             (getCharacterById(attackerId)?.status.attack.range ?? 0) > 1 && (
               <button
                 onClick={() => setMeleeBonus(!meleeBonus)}
-                className={`w-full px-2 py-1 rounded transition text-xs ${meleeBonus
+                className={`w-full px-2 py-1 rounded transition text-xs ${
+                  meleeBonus
                     ? "bg-gray-600 hover:bg-gray-700 text-white"
                     : " border border-gray-600 hover:bg-gray-700 text-white"
-                  }`}
+                }`}
               >
                 {meleeBonus ? "⚔︎ Melee (+4)" : "Melee"}
               </button>
             )}
-          {attackerId &&
-            getCharacterById(attackerId)?.role === "Vanguard" && (
-              <button
-                onClick={() => setDamageBonus(!damageBonus)}
-                className={`w-full px-2 py-1 rounded transition text-xs ${damageBonus
-                    ? "bg-gray-600 hover:bg-gray-700 text-white"
-                    : " border border-gray-600 hover:bg-gray-700 text-white"
-                  }`}
-              >
-                {damageBonus ? "⚡︎ Charge (+1)" : "Charge"}
-              </button>
-            )}
+          {attackerId && getCharacterById(attackerId)?.role === "Vanguard" && (
+            <button
+              onClick={() => setDamageBonus(!damageBonus)}
+              className={`w-full px-2 py-1 rounded transition text-xs ${
+                damageBonus
+                  ? "bg-gray-600 hover:bg-gray-700 text-white"
+                  : " border border-gray-600 hover:bg-gray-700 text-white"
+              }`}
+            >
+              {damageBonus ? "⚡︎ Charge (+1)" : "Charge"}
+            </button>
+          )}
           <button
             onClick={() => setGangUp(!gangUp)}
-            className={`w-full px-2 py-1 rounded transition text-xs ${gangUp
+            className={`w-full px-2 py-1 rounded transition text-xs ${
+              gangUp
                 ? "bg-gray-600 hover:bg-gray-700 text-white"
                 : " border border-gray-600 hover:bg-gray-700 text-white"
-              }`}
+            }`}
           >
             {gangUp ? "⚔︎ Gang (-2)" : "Gang"}
           </button>
           <button
             onClick={() => setLightCover(!lightCover)}
-            className={`w-full px-2 py-1 rounded transition text-xs ${lightCover
+            className={`w-full px-2 py-1 rounded transition text-xs ${
+              lightCover
                 ? "bg-gray-600 hover:bg-gray-700 text-white"
                 : " border border-gray-600 hover:bg-gray-700 text-white"
-              }`}
+            }`}
           >
             {lightCover ? "⛉ Cover (-2)" : "Cover"}
           </button>
           {defenderId && (
             <button
               onClick={() => setCounterAttack(!counterAttack)}
-              className={`w-full px-2 py-1 rounded transition text-xs ${counterAttack
+              className={`w-full px-2 py-1 rounded transition text-xs ${
+                counterAttack
                   ? "bg-red-600 hover:bg-red-700 text-white"
                   : " border border-red-500 hover:bg-red-900/30 text-red-300"
-                }`}
+              }`}
             >
               {counterAttack ? "🗡 Counter" : "Counter"}
             </button>
           )}
           <button
             onClick={() => setAttackFree(!attackFree)}
-            className={`w-full px-2 py-1 rounded transition text-xs ${attackFree
+            className={`w-full px-2 py-1 rounded transition text-xs ${
+              attackFree
                 ? "bg-green-600 hover:bg-green-700 text-white"
                 : " border border-green-500 hover:bg-green-900/30 text-green-300"
-              }`}
+            }`}
           >
             {attackFree ? "🗡 Free" : "Free"}
           </button>
@@ -253,13 +268,15 @@ export default function BattleActionPanel({
                       selectedSkill === skill.id ? null : skill.id,
                     );
                   }}
-                  className={`px-2 py-1 rounded text-xs font-semibold transition ${selectedSkill === skill.id
-                    ? "bg-purple-600 hover:bg-purple-700 text-white"
-                    : "border border-purple-500 hover:bg-purple-900/30 text-purple-300"
-                    } ${(currentAp?.[attackerId] ?? 0) < skill.ap
+                  className={`px-2 py-1 rounded text-xs font-semibold transition ${
+                    selectedSkill === skill.id
+                      ? "bg-purple-600 hover:bg-purple-700 text-white"
+                      : "border border-purple-500 hover:bg-purple-900/30 text-purple-300"
+                  } ${
+                    (currentAp?.[attackerId] ?? 0) < skill.ap
                       ? "opacity-50 cursor-not-allowed"
                       : ""
-                    }`}
+                  }`}
                   disabled={(currentAp?.[attackerId] ?? 0) < skill.ap}
                   title={`${skill.name} - AP Cost: ${skill.ap}`}
                 >
@@ -483,13 +500,47 @@ export default function BattleActionPanel({
           </div>
         ) : (
           <div className="flex gap-2">
+            {/* Assist button for Support role when attacker & defender are same team */}
+            {attackerId &&
+              defenderId &&
+              getCharacterById(attackerId)?.role === "Support" &&
+              getTeamColorClass(attackerId) ===
+                getTeamColorClass(defenderId) && (
+                <button
+                  disabled={
+                    isAttacking ||
+                    (attackerId !== null &&
+                      !attackFree &&
+                      (currentAp?.[attackerId] ?? 0) <
+                        (getCharacterById(attackerId)?.status.attack.ap ?? 1))
+                  }
+                  onClick={() => {
+                    if (!attackerId || !defenderId) return;
+                    if (assistUsed) {
+                      addNotification("Assist ใช้แล้วในเทิร์นนี้", "info");
+                      return;
+                    }
+                    // transfer 1 AP: reduce from attacker, add to defender (reduceAp with negative adds)
+                    reduceAp(attackerId, 1);
+                    reduceAp(defenderId, -1);
+                    setAssistUsed(true);
+                    addNotification(
+                      `${getCharacterById(attackerId)?.name} ส่ง 1 AP ให้ ${getCharacterById(defenderId)?.name}`,
+                      "success",
+                    );
+                  }}
+                  className="px-3 py-1 rounded bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-900 disabled:opacity-50 text-white text-sm"
+                >
+                  Assist
+                </button>
+              )}
             <button
               disabled={
                 isAttacking ||
                 (attackerId !== null &&
                   !attackFree &&
                   (currentAp?.[attackerId] ?? 0) <
-                  (getCharacterById(attackerId)?.status.attack.ap ?? 1))
+                    (getCharacterById(attackerId)?.status.attack.ap ?? 1))
               }
               onClick={() => {
                 if (!attackerId || !defenderId) {
@@ -525,7 +576,13 @@ export default function BattleActionPanel({
               Attack
             </button>
             <button
-              disabled={isAttacking}
+              disabled={
+                isAttacking ||
+                (attackerId !== null &&
+                  !attackFree &&
+                  (currentAp?.[attackerId] ?? 0) <
+                    (getCharacterById(attackerId)?.status.attack.ap ?? 1))
+              }
               onClick={() => {
                 if (!attackerId || !defenderId) {
                   addNotification("กรุณาเลือกผู้โจมตีและผู้ป้องกัน", "error");
@@ -550,8 +607,7 @@ export default function BattleActionPanel({
                 }
 
                 setIsAttacking(true);
-                // consume AP
-                reduceAp(attackerId, apCost);
+                // consume AP (only once; don't deduct when attackFree)
                 if (!attackFree) {
                   reduceAp(attackerId, apCost);
                 }
@@ -566,7 +622,10 @@ export default function BattleActionPanel({
                 // apply damage without duplicate notification
                 applyDamageInternal(defenderId, critDmg);
 
-                const newHp = Math.max(0, (currentHp?.[defenderId] ?? 0) - critDmg);
+                const newHp = Math.max(
+                  0,
+                  (currentHp?.[defenderId] ?? 0) - critDmg,
+                );
                 addNotification(
                   `💥 ${attacker.name} โจมตีแบบ Critical → ${getCharacterById(defenderId)?.name}! DMG: ${critDmg} (HP: ${newHp})`,
                   "success",
@@ -586,7 +645,13 @@ export default function BattleActionPanel({
               Critical
             </button>
             <button
-              disabled={isAttacking}
+              disabled={
+                isAttacking ||
+                (attackerId !== null &&
+                  !attackFree &&
+                  (currentAp?.[attackerId] ?? 0) <
+                    (getCharacterById(attackerId)?.status.attack.ap ?? 1))
+              }
               onClick={() => {
                 if (!attackerId || !defenderId) {
                   addNotification("กรุณาเลือกผู้โจมตีและผู้ป้องกัน", "error");
