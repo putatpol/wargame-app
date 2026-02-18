@@ -69,8 +69,8 @@
       }
     ],
     "resist": {
-      "dice": null,
-      "ap": 10,
+      "dice": 10,
+      "ap": null,
       "turn": 2
     }
   },
@@ -92,8 +92,8 @@
       }
     ],
     "resist": {
-      "dice": null,
-      "ap": 10,
+      "dice": 10,
+      "ap": null,
       "turn": null
     }
   },
