@@ -24,7 +24,7 @@
         "id": 1,
         "name": "Dragon’s Shield",
         "ap": 1,
-        "hitOn": 6,
+        "hitOn": 8,
         "range": "3 AOE",
         "card": "/images/card/1_1.png",
         "description": "บัฟโล่เพลิงให้เพื่อน Def Target -1 (กันง่ายขึ้น) และสะท้อน 2 Fixed Dmg ใส่สายประชิด",
@@ -187,7 +187,7 @@
         "id": 1,
         "name": "Eagle’s Pounce",
         "ap": 1,
-        "hitOn": 12,
+        "hitOn": 10,
         "range": "4",
         "card": "/images/card/5_1.png",
         "description": "ข้ามสิ่งกีดขวาง + โจมตีทันที หากโดนเป้าหมายติด [Prone]",
@@ -381,7 +381,7 @@
         "id": 1,
         "name": "Soul Strike",
         "ap": 1,
-        "hitOn": 12,
+        "hitOn": 10,
         "range": "1",
         "card": "/images/card/9_1.png",
         "description": "ดาบฟันวิญญาน โจมตีศัตรูติด [Fractured] (Def Target +3 ถาวร ซ้อนทับได้)",
@@ -539,7 +539,7 @@
       "def": 8,
       "attack": {
         "ap": 1,
-        "hitOn": 12,
+        "hitOn": 10,
         "range": 1,
         "damage": 6
       }
