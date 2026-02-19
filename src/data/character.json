@@ -505,7 +505,7 @@
         "name": "Nature’s Wrath",
         "ap": 2,
         "hitOn": 8,
-        "range": "10 (กว้าง 4)",
+        "range": "10 (radius 4)",
         "card": "/images/card/12_1.png",
         "description": "สร้างพื้นที่ป่า: ศัตรูติด [Silence] (ห้ามใช้สกิล) / เพื่อนได้ [Cover] (Def Target -1)",
         "effect": [

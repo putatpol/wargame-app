@@ -1,4 +1,5 @@
- {
+[
+  {
     "id": 15,
     "name": "Oracle",
     "role": "Mage",
@@ -29,4 +30,101 @@
         "effect": []
       }
     ]
+  },
+  {
+    "id": 16,
+    "name": "The Faceless",
+    "role": "Tank",
+    "race": "Unknown",
+    "class": "Paladin",
+    "avatar": "/images/avatar/16.png",
+    "status": {
+      "ap": 2,
+      "move": 4,
+      "hp": 20,
+      "def": 8,
+      "attack": {
+        "ap": 1,
+        "hitOn": 10,
+        "range": 1,
+        "damage": 6
+      }
+    },
+    "skills": [
+      {
+        "id": 1,
+        "name": "Compelled Duel",
+        "ap": 1,
+        "hitOn": 8,
+        "range": "8",
+        "card": "/images/card/16_1.png",
+        "description": "บังคับศัตรู 1 ตัวให้ต้องโจมตีหรือใช้สกิลใส่ The Faceless เท่านั้นในเทิร์นหน้า หากมันไปโจมตีคนอื่น ดาเมจจะลดลงครึ่งหนึ่ง และมันจะโดน Fixed 4 Dmg ทันที",
+        "effect": []
+      }
+    ]
+  },
+  {
+    "id": 17,
+    "name": "Zothan",
+    "role": "Mage",
+    "race": "Dwarf",
+    "class": "Warlock",
+    "avatar": "/images/avatar/17.png",
+    "status": {
+      "ap": 3,
+      "move": 5,
+      "hp": 12,
+      "def": 15,
+      "attack": {
+        "ap": 1,
+        "hitOn": 10,
+        "range": 10,
+        "damage": 7
+      }
+    },
+    "skills": [
+      {
+        "id": 1,
+        "name": "Eldritch Tentacles",
+        "ap": 2,
+        "hitOn": 8,
+        "range": "8 radius 3",
+        "card": "/images/card/17_1.png",
+        "description": "ระเบิดพลังหนวดปลาหมึกรอบเป้าหมาย ศัตรูทุกตัวในระยะโดน Fixed 5 Dmg และถูกดูด (Pull) เข้าหาจุดศูนย์กลาง 2 นิ้ว",
+        "effect": []
+      }
+    ]
+  },
+  {
+    "id": 18,
+    "name": "Vestra",
+    "role": "Support",
+    "race": "Human",
+    "class": "Cleric",
+    "avatar": "/images/avatar/18.png",
+    "status": {
+      "ap": 2,
+      "move": 5,
+      "hp": 14,
+      "def": 15,
+      "attack": {
+        "ap": 1,
+        "hitOn": 12,
+        "range": 7,
+        "damage": 4
+      }
+    },
+    "skills": [
+      {
+        "id": 1,
+        "name": "Soul Fracture & Rebirth",
+        "ap": 2,
+        "hitOn": 8,
+        "range": "8",
+        "card": "/images/card/18_1.png",
+        "description": "สาปศัตรูให้ทุกครั้งที่มันโดนตี สะสม 1 แต้ม โดยจะจ่ายแต้มสะสม: ฮีล (1 แต้ม/1 HP) หรือ ชุบชีวิต (ใช้ 5 แต้ม)",
+        "effect": []
+      }
+    ]
   }
+]
