@@ -78,5 +78,10 @@
     "id": 16,
     "name": "Warforged",
     "description": "ไม่ติดสถานะ [Bleed] และไม่ต้องใช้ AP ในการลุกขึ้นยืนเมื่อติด [Prone]"
+  },
+  {
+    "id": 17,
+    "name": "Dryad",
+    "description": "ฟื้น HP 2 หน่วยถ้าไม่ขยับ แต่แพ้ทางไฟ +2 Dmg"
   }
 ]
