@@ -28,7 +28,8 @@ type TeamSectionProps = {
   attackerId: number | null;
   defenderId: number | null;
   openMenuId: number | null;
-  activeStatusBuffs: Record<number, number[]> | undefined;
+  // activeStatusBuffs entries now include remaining turn counters
+  activeStatusBuffs: Record<number, { id: number; remaining?: number | null }[]> | undefined;
   statusBuffs: StatusBuff[];
   raceData: { name: string; description: string }[];
   characterStatBoost: Record<number, string | null | undefined>;
@@ -283,39 +284,47 @@ export default function TeamSection({
                 </div>
 
                 {/* Active Statuses */}
-                {((activeStatusBuffs?.[char.id] ?? []) as number[]).length >
-                  0 && (
-                    <div className="mt-3 mb-3">
-                      <p className="text-xs text-gray-400 mb-1">Status</p>
-                      <div className="flex gap-2 flex-wrap">
-                        {(activeStatusBuffs?.[char.id] ?? []).map((bid) => {
-                          const b = statusBuffs.find((s) => s.id === bid);
-                          return (
-                            <span
-                              key={bid}
-                              title={b?.description}
-                              className={`text-sm px-2 py-1 rounded flex items-center gap-2 ${b?.stat === "debuff" ? "bg-red-900/50" : b?.stat === "buff" ? "bg-green-900/50" : "bg-gray-700"}`}
-                            >
-                              <Image
-                                alt={b?.thaiName ?? `#${bid}`}
-                                src={b?.image ?? ""}
-                                width={16}
-                                height={16}
-                              />
+                {(activeStatusBuffs?.[char.id] ?? []).length > 0 && (
+                  <div className="mt-3 mb-3">
+                    <p className="text-xs text-gray-400 mb-1">Status</p>
+                    <div className="flex gap-2 flex-wrap">
+                      {(activeStatusBuffs?.[char.id] ?? []).map((entry) => {
+                        const bid = entry.id;
+                        const b = statusBuffs.find((s) => s.id === bid);
+                        const expired = entry.remaining !== undefined && entry.remaining !== null && entry.remaining <= 0;
+                        return (
+                          <span
+                            key={bid}
+                            title={b?.description}
+                            className={`text-sm px-2 py-1 rounded flex items-center gap-2 ${b?.stat === "debuff" ? "bg-red-900/50" : b?.stat === "buff" ? "bg-green-900/50" : "bg-gray-700"}`}
+                          >
+                            <Image
+                              alt={b?.thaiName ?? `#${bid}`}
+                              src={b?.image ?? ""}
+                              width={16}
+                              height={16}
+                            />
+                            <div>
                               <span>{b?.thaiName ?? `#${bid}`}</span>
-                              <button
-                                onClick={() => handleTryRemove(char.id, bid)}
-                                className="text-xs text-red-400 hover:text-red-200"
-                                aria-label="remove-status"
-                              >
-                                ✕
-                              </button>
-                            </span>
-                          );
-                        })}
-                      </div>
+                              {entry.remaining !== undefined && entry.remaining !== null && (
+                                <span className={`text-xs rounded ${expired ? 'pl-1' : 'bg-red-600 text-gray-100 ml-2 px-1.5'}`}>
+                                  {expired ? '🚩' : `${entry.remaining}`}
+                                </span>
+                              )}
+                            </div>
+                            <button
+                              onClick={() => handleTryRemove(char.id, bid)}
+                              className="text-xs text-red-400 hover:text-red-200"
+                              aria-label="remove-status"
+                            >
+                              ✕
+                            </button>
+                          </span>
+                        );
+                      })}
                     </div>
-                  )}
+                  </div>
+                )}
 
                 {/* Buttons */}
                 <div className="flex gap-2 flex-wrap">

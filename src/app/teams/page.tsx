@@ -92,8 +92,10 @@ export default function TeamsPage() {
 
     const disablingBuffEngNames = ["fearful", "frozen", "prone"];
 
-    return buffs.some((buffId) => {
-      const buff = statusBuffs.find((b) => b.id === buffId);
+    return buffs.some((entry) => {
+      // only consider non-expired buffs (remaining === null/undefined => permanent; remaining > 0 => active)
+      if (entry.remaining !== undefined && entry.remaining !== null && entry.remaining <= 0) return false;
+      const buff = statusBuffs.find((b) => b.id === entry.id);
       return buff ? disablingBuffEngNames.includes(buff.engName) : false;
     });
   };
