@@ -44,6 +44,7 @@ type TeamSectionProps = {
   onToggleAttacker: (char: Character) => void;
   onToggleDefender: (char: Character) => void;
   onSkipTurn: (char: Character) => void;
+  reduceAp: (characterId: number, amount: number) => void;
 };
 
 export default function TeamSection({
@@ -74,6 +75,7 @@ export default function TeamSection({
   onToggleAttacker,
   onToggleDefender,
   onSkipTurn,
+  reduceAp,
 }: TeamSectionProps) {
   const [showRemoveModal, setShowRemoveModal] = React.useState(false);
   const [pendingRemove, setPendingRemove] = React.useState<{
@@ -283,37 +285,37 @@ export default function TeamSection({
                 {/* Active Statuses */}
                 {((activeStatusBuffs?.[char.id] ?? []) as number[]).length >
                   0 && (
-                  <div className="mt-3 mb-3">
-                    <p className="text-xs text-gray-400 mb-1">Status</p>
-                    <div className="flex gap-2 flex-wrap">
-                      {(activeStatusBuffs?.[char.id] ?? []).map((bid) => {
-                        const b = statusBuffs.find((s) => s.id === bid);
-                        return (
-                          <span
-                            key={bid}
-                            title={b?.description}
-                            className={`text-sm px-2 py-1 rounded flex items-center gap-2 ${b?.stat === "debuff" ? "bg-red-900/50" : b?.stat === "buff" ? "bg-green-900/50" : "bg-gray-700"}`}
-                          >
-                            <Image
-                              alt={b?.thaiName ?? `#${bid}`}
-                              src={b?.image ?? ""}
-                              width={16}
-                              height={16}
-                            />
-                            <span>{b?.thaiName ?? `#${bid}`}</span>
-                            <button
-                              onClick={() => handleTryRemove(char.id, bid)}
-                              className="text-xs text-red-400 hover:text-red-200"
-                              aria-label="remove-status"
+                    <div className="mt-3 mb-3">
+                      <p className="text-xs text-gray-400 mb-1">Status</p>
+                      <div className="flex gap-2 flex-wrap">
+                        {(activeStatusBuffs?.[char.id] ?? []).map((bid) => {
+                          const b = statusBuffs.find((s) => s.id === bid);
+                          return (
+                            <span
+                              key={bid}
+                              title={b?.description}
+                              className={`text-sm px-2 py-1 rounded flex items-center gap-2 ${b?.stat === "debuff" ? "bg-red-900/50" : b?.stat === "buff" ? "bg-green-900/50" : "bg-gray-700"}`}
                             >
-                              ✕
-                            </button>
-                          </span>
-                        );
-                      })}
+                              <Image
+                                alt={b?.thaiName ?? `#${bid}`}
+                                src={b?.image ?? ""}
+                                width={16}
+                                height={16}
+                              />
+                              <span>{b?.thaiName ?? `#${bid}`}</span>
+                              <button
+                                onClick={() => handleTryRemove(char.id, bid)}
+                                className="text-xs text-red-400 hover:text-red-200"
+                                aria-label="remove-status"
+                              >
+                                ✕
+                              </button>
+                            </span>
+                          );
+                        })}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
 
                 {/* Buttons */}
                 <div className="flex gap-2 flex-wrap">
@@ -433,6 +435,7 @@ export default function TeamSection({
           removeStatusBuff={removeStatusBuff}
           setShowRemoveModal={setShowRemoveModal}
           setPendingRemove={setPendingRemove}
+          reduceAp={reduceAp}
         />
       )}
     </div>

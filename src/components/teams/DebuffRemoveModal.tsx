@@ -11,13 +11,29 @@ type DebuffRemoveModalProps = {
   removeStatusBuff: (characterId: number, buffId: number) => void;
   setShowRemoveModal: (show: boolean) => void;
   setPendingRemove: React.Dispatch<React.SetStateAction<{ characterId: number; buffId: number; buff?: StatusBuff | undefined; } | null>>;
+  reduceAp: (characterId: number, amount: number) => void;
 };
 
-const DebuffRemoveModal = ({ pendingRemove, removeStatusBuff, setShowRemoveModal, setPendingRemove }: DebuffRemoveModalProps) => {
+const DebuffRemoveModal = ({ pendingRemove, removeStatusBuff, setShowRemoveModal, setPendingRemove, reduceAp }: DebuffRemoveModalProps) => {
   const confirmRemove = () => {
     if (pendingRemove) {
       removeStatusBuff(pendingRemove.characterId, pendingRemove.buffId);
     }
+    setShowRemoveModal(false);
+    setPendingRemove(null);
+  };
+
+  const confirmRemoveAP = () => {
+    if (!pendingRemove) return;
+
+    const apCost = pendingRemove.buff?.resist?.ap ?? 0;
+    if (apCost > 0) {
+      // reduce AP from the character
+      reduceAp(pendingRemove.characterId, apCost);
+      // then remove the status buff
+      removeStatusBuff(pendingRemove.characterId, pendingRemove.buffId);
+    }
+
     setShowRemoveModal(false);
     setPendingRemove(null);
   };
@@ -58,10 +74,15 @@ const DebuffRemoveModal = ({ pendingRemove, removeStatusBuff, setShowRemoveModal
               <p>ครบกำหนดเทิร์น: <span className="text-white">{pendingRemove.buff?.resist?.turn ?? "-"}</span></p>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-3 gap-3">
               <button onClick={cancelRemove} className="w-full bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded font-semibold transition">
                 ยกเลิก
               </button>
+              {pendingRemove.buff?.resist?.ap && (
+                <button onClick={confirmRemoveAP} className="w-full bg-violet-500 hover:bg-violet-600 text-white px-4 py-2 rounded font-semibold transition">
+                  ใช้ AP
+                </button>
+              )}
               <button onClick={confirmRemove} className="w-full bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded font-semibold transition">
                 ตกลง
               </button>

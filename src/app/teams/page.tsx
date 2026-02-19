@@ -338,6 +338,7 @@ export default function TeamsPage() {
               isAttackDisabledByBuff={isAttackDisabledByBuff}
               getDisplayStat={getDisplayStat}
               removeStatusBuff={removeStatusBuff}
+              reduceAp={reduceAp}
               onViewCard={handleViewCard}
               onToggleMenu={handleToggleMenu}
               onOpenStatBoost={handleOpenStatBoost}
@@ -369,6 +370,7 @@ export default function TeamsPage() {
               isAttackDisabledByBuff={isAttackDisabledByBuff}
               getDisplayStat={getDisplayStat}
               removeStatusBuff={removeStatusBuff}
+              reduceAp={reduceAp}
               onViewCard={handleViewCard}
               onToggleMenu={handleToggleMenu}
               onOpenStatBoost={handleOpenStatBoost}
