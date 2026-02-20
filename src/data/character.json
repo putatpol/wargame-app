@@ -24,7 +24,7 @@
         "id": 1,
         "name": "Dragon’s Shield",
         "ap": 1,
-        "hitOn": 6,
+        "hitOn": 8,
         "range": "3 AOE",
         "card": "/images/card/1_1.png",
         "description": "บัฟโล่เพลิงให้เพื่อน Def Target -1 (กันง่ายขึ้น) และสะท้อน 2 Fixed Dmg ใส่สายประชิด",
@@ -187,7 +187,7 @@
         "id": 1,
         "name": "Eagle’s Pounce",
         "ap": 1,
-        "hitOn": 12,
+        "hitOn": 10,
         "range": "4",
         "card": "/images/card/5_1.png",
         "description": "ข้ามสิ่งกีดขวาง + โจมตีทันที หากโดนเป้าหมายติด [Prone]",
@@ -207,7 +207,7 @@
     "name": "Kaelen",
     "role": "Dps",
     "race": "Human",
-    "class": "Rouge",
+    "class": "Rogue",
     "avatar": "/images/avatar/6.png",
     "status": {
       "ap": 3,
@@ -381,7 +381,7 @@
         "id": 1,
         "name": "Soul Strike",
         "ap": 1,
-        "hitOn": 12,
+        "hitOn": 10,
         "range": "1",
         "card": "/images/card/9_1.png",
         "description": "ดาบฟันวิญญาน โจมตีศัตรูติด [Fractured] (Def Target +3 ถาวร ซ้อนทับได้)",
@@ -505,7 +505,7 @@
         "name": "Nature’s Wrath",
         "ap": 2,
         "hitOn": 8,
-        "range": "10 (กว้าง 4)",
+        "range": "10 (radius 4)",
         "card": "/images/card/12_1.png",
         "description": "สร้างพื้นที่ป่า: ศัตรูติด [Silence] (ห้ามใช้สกิล) / เพื่อนได้ [Cover] (Def Target -1)",
         "effect": [
@@ -539,7 +539,7 @@
       "def": 8,
       "attack": {
         "ap": 1,
-        "hitOn": 12,
+        "hitOn": 10,
         "range": 1,
         "damage": 6
       }
@@ -606,6 +606,38 @@
             "target": "enemy"
           }
         ]
+      }
+    ]
+  },
+  {
+    "id": 21,
+    "name": "Fractured Warloard",
+    "role": "Vanguard",
+    "race": "Dryad",
+    "class": "Fighter",
+    "avatar": "/images/avatar/21.png",
+    "status": {
+      "ap": 2,
+      "move": 6,
+      "hp": 18,
+      "def": 12,
+      "attack": {
+        "ap": 1,
+        "hitOn": 10,
+        "range": 1,
+        "damage": 5
+      }
+    },
+    "skills": [
+      {
+        "id": 1,
+        "name": "Shadow Sweep",
+        "ap": 2,
+        "hitOn": 10,
+        "range": "2 AOE",
+        "card": "/images/card/21_1.png",
+        "description": "ระเบิดไฟระยะ 2 รอบตัว ทำดาเมจ D6 และผลักศัตรู 2 พร้อมติดสถานะ Burn",
+        "effect": []
       }
     ]
   }

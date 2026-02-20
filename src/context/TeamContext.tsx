@@ -50,7 +50,8 @@ interface TeamContextType {
     characterId: number,
     stat: "move" | "hp" | "def" | "hiton",
   ) => void;
-  activeStatusBuffs: { [characterId: number]: number[] };
+  // now each active status entry can include remaining turns
+  activeStatusBuffs: { [characterId: number]: { id: number; remaining?: number | null }[] };
   addStatusBuff: (characterId: number, buffId: number) => void;
   removeStatusBuff: (characterId: number, buffId: number) => void;
 }
@@ -91,8 +92,10 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
   const [characterStatBoost, setCharacterStatBoost] = useState<{
     [characterId: number]: "move" | "hp" | "def" | "hiton" | null;
   }>({});
+  // activeStatusBuffs now tracks objects so we can store remaining turns
+  type ActiveBuffEntry = { id: number; remaining?: number | null };
   const [activeStatusBuffs, setActiveStatusBuffs] = useState<{
-    [characterId: number]: number[];
+    [characterId: number]: ActiveBuffEntry[];
   }>({});
 
   const addNotification = (
@@ -207,6 +210,21 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
 
   const endTurn = () => {
     setTurnNumber((t) => t + 1);
+
+    // decrement remaining turns for buffs that have a remaining value
+    setActiveStatusBuffs((prev) => {
+      const next: typeof prev = {};
+      Object.keys(prev).forEach((key) => {
+        const cid = Number(key);
+        next[cid] = (prev[cid] ?? []).map((entry) => {
+          if (entry.remaining == null) return entry;
+          // decrement but don't go below 0
+          return { ...entry, remaining: Math.max(0, entry.remaining - 1) };
+        });
+      });
+      return next;
+    });
+
     // restore AP to initial for all characters
     setCurrentAp({ ...initialApMap });
     addNotification(`🕒 จบเทิร์น คืน AP ให้ตัวละครทั้งหมด`, "info");
@@ -451,7 +469,7 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
       return;
     }
     const existing = activeStatusBuffs[characterId] ?? [];
-    if (existing.includes(buffId)) {
+    if (existing.some((e) => e.id === buffId)) {
       addNotification(
         `${characterName} มีสถานะ ${buff.thaiName} อยู่แล้ว`,
         "info",
@@ -459,9 +477,12 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
+    // if buff has resist.turn, initialize remaining with that value
+    const duration = buff?.resist?.turn ?? null;
+
     setActiveStatusBuffs((prev) => ({
       ...prev,
-      [characterId]: [...(prev[characterId] ?? []), buffId],
+      [characterId]: [...(prev[characterId] ?? []), { id: buffId, remaining: duration }],
     }));
 
     // If the buff is an action, reduce AP by 1
@@ -481,14 +502,14 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
     const characterName = character?.name || `#${characterId}`;
     const buff = (statusBuffData as any[]).find((b) => b.id === buffId);
     const existing = activeStatusBuffs[characterId] ?? [];
-    if (!existing.includes(buffId)) {
+    if (!existing.some((e) => e.id === buffId)) {
       // nothing to remove
       return;
     }
 
     setActiveStatusBuffs((prev) => ({
       ...prev,
-      [characterId]: (prev[characterId] ?? []).filter((id) => id !== buffId),
+      [characterId]: (prev[characterId] ?? []).filter((e) => e.id !== buffId),
     }));
 
     addNotification(
