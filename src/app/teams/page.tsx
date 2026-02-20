@@ -67,6 +67,7 @@ export default function TeamsPage() {
   const [lightCover, setLightCover] = React.useState(false);
   const [counterAttack, setCounterAttack] = React.useState(false);
   const [attackFree, setAttackFree] = React.useState(false);
+  const [criticalBlock, setCriticalBlock] = React.useState(false);
   const [selectedSkill, setSelectedSkill] = React.useState<number | null>(null);
   const [statBoostModal, setStatBoostModal] = React.useState<{
     characterId: number;
@@ -436,6 +437,8 @@ export default function TeamsPage() {
           setCounterAttack={setCounterAttack}
           attackFree={attackFree}
           setAttackFree={setAttackFree}
+          criticalBlock={criticalBlock}
+          setCriticalBlock={setCriticalBlock}
           selectedSkill={selectedSkill}
           setSelectedSkill={setSelectedSkill}
           isAttacking={isAttacking}

@@ -405,7 +405,7 @@ export default function TeamSection({
                     className="border border-amber-500 hover:bg-amber-600 disabled:opacity-50 disabled:cursor-not-allowed text-black px-4 py-2 rounded font-semibold"
                     disabled={
                       (currentHp?.[char.id] ?? char.status.hp) === 0 ||
-                      (currentAp?.[char.id] ?? 0) === 0 ||
+                    //   (currentAp?.[char.id] ?? 0) === 0 ||
                       isAttackDisabledByBuff(char.id)
                     }
                   >
