@@ -27,6 +27,8 @@ type BattleActionPanelProps = {
   setCounterAttack: (value: boolean) => void;
   attackFree: boolean;
   setAttackFree: (value: boolean) => void;
+  criticalBlock: boolean;
+  setCriticalBlock: (value: boolean) => void;
   selectedSkill: number | null;
   setSelectedSkill: (value: number | null) => void;
   isAttacking: boolean;
@@ -72,6 +74,8 @@ export default function BattleActionPanel({
   setCounterAttack,
   attackFree,
   setAttackFree,
+  criticalBlock,
+  setCriticalBlock,
   selectedSkill,
   setSelectedSkill,
   isAttacking,
@@ -253,6 +257,18 @@ export default function BattleActionPanel({
           >
             {attackFree ? "🗡 Free" : "Free"}
           </button>
+          {defenderId && (
+            <button
+              onClick={() => setCriticalBlock(!criticalBlock)}
+              className={`w-full px-2 py-1 rounded transition text-xs ${
+                criticalBlock
+                  ? "bg-purple-600 hover:bg-purple-700 text-white"
+                  : " border border-purple-500 hover:bg-purple-900/30 text-purple-300"
+              }`}
+            >
+              {criticalBlock ? "🛡 Crit Block" : "Crit Block"}
+            </button>
+          )}
         </div>
 
         {/* Skill Selection */}
@@ -569,6 +585,7 @@ export default function BattleActionPanel({
                   setGangUp(false);
                   setLightCover(false);
                   setAttackFree(false);
+                  setCriticalBlock(false);
                 }, 3000);
               }}
               className="flex-1 bg-red-600 hover:bg-red-700 disabled:bg-red-900 disabled:opacity-50 text-white px-3 py-2 rounded transition"
@@ -618,16 +635,22 @@ export default function BattleActionPanel({
                 const baseDmg = attacker.status.attack?.damage ?? 0;
                 const critDmg =
                   Math.ceil(baseDmg * 1.5) + (damageBonus ? 1 : 0);
+                
+                // If critical block is active, only take the critical bonus (not base damage)
+                const criticalBonus = Math.ceil(baseDmg * 1.5) - baseDmg;
+                const actualDamage = criticalBlock ? criticalBonus + (damageBonus ? 1 : 0) : critDmg;
 
                 // apply damage without duplicate notification
-                applyDamageInternal(defenderId, critDmg);
+                applyDamageInternal(defenderId, actualDamage);
 
                 const newHp = Math.max(
                   0,
-                  (currentHp?.[defenderId] ?? 0) - critDmg,
+                  (currentHp?.[defenderId] ?? 0) - actualDamage,
                 );
+                
+                const damageType = criticalBlock ? "Block" : "Critical";
                 addNotification(
-                  `💥 ${attacker.name} โจมตีแบบ Critical → ${getCharacterById(defenderId)?.name}! DMG: ${critDmg} (HP: ${newHp})`,
+                  `💥 ${attacker.name} โจมตีแบบ ${damageType} → ${getCharacterById(defenderId)?.name}! DMG: ${actualDamage} (HP: ${newHp})`,
                   "success",
                 );
 
@@ -638,6 +661,7 @@ export default function BattleActionPanel({
                   setGangUp(false);
                   setLightCover(false);
                   setAttackFree(false);
+                  setCriticalBlock(false);
                 }, 3000);
               }}
               className="flex-1 text-white bg-amber-700 hover:bg-amber-800 disabled:bg-amber-900 disabled:opacity-50 px-3 py-2 rounded transition"
@@ -678,6 +702,7 @@ export default function BattleActionPanel({
                   setGangUp(false);
                   setLightCover(false);
                   setAttackFree(false);
+                  setCriticalBlock(false);
                 }, 3000);
               }}
               className="flex-1 bg-gray-600 hover:bg-gray-700 disabled:bg-gray-800 disabled:opacity-50 text-white px-3 py-2 rounded transition"
