@@ -15,7 +15,7 @@
   - Tank damage -1 เมื่อโดนโจมตี
   - Human ให้เลือก stat boost ได้ 1 อย่าง
   - Dragonborn แสดงค่าเมินดาเมจจากสถานะ
-  - Dwarf HP +2 [pending]
+  - Dwarf HP +2 Move -1 [pending]
   - Goliath HP +3, Def +1
   - Elf Move +1
   - Lizardfolk Def -1 [pending]

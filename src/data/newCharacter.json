@@ -126,5 +126,69 @@
         "effect": []
       }
     ]
+  },
+  {
+    "id": 19,
+    "name": "The blessed sentinel",
+    "role": "Dps",
+    "race": "Dryad",
+    "class": "Ranger",
+    "avatar": "/images/avatar/19.png",
+    "status": {
+      "ap": 3,
+      "move": 7,
+      "hp": 14,
+      "def": 12,
+      "attack": {
+        "ap": 1,
+        "hitOn": 8,
+        "range": 12,
+        "damage": 5
+      }
+    },
+    "skills": [
+      {
+        "id": 1,
+        "name": "Living Arrow",
+        "ap": 1,
+        "hitOn": 9,
+        "range": "12",
+        "card": "/images/card/19_1.png",
+        "description": "ยิงธนูทำดาเมจ 5 และติดสตั้นหากเป้าหมายอยู่ใกล้ต้นไม้หรือสิ่งกีดขวาง จะได้รับโบนัส Hit on -1",
+        "effect": []
+      }
+    ]
+  },
+  {
+    "id": 20,
+    "name": "Midnight Huntress",
+    "role": "Vanguard",
+    "race": "Human",
+    "class": "Fighter",
+    "avatar": "/images/avatar/20.png",
+    "status": {
+      "ap": 2,
+      "move": 6,
+      "hp": 18,
+      "def": 12,
+      "attack": {
+        "ap": 1,
+        "hitOn": 10,
+        "range": 1,
+        "damage": 5
+      }
+    },
+    "skills": [
+      {
+        "id": 1,
+        "name": "Shadow Sweep",
+        "ap": 1,
+        "hitOn": 10,
+        "range": "6",
+        "card": "/images/card/20_1.png",
+        "description": "พุ่งไปยังที่ว่างในระยะ 6 นิ้ว แล้วกวาดศัตรูในระยะ 1 ทำดาเมจ 4 และติดสถานะ Slow",
+        "effect": []
+      }
+    ]
   }
 ]

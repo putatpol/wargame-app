@@ -608,5 +608,37 @@
         ]
       }
     ]
+  },
+  {
+    "id": 21,
+    "name": "Fractured Warloard",
+    "role": "Vanguard",
+    "race": "Dryad",
+    "class": "Fighter",
+    "avatar": "/images/avatar/21.png",
+    "status": {
+      "ap": 2,
+      "move": 6,
+      "hp": 18,
+      "def": 12,
+      "attack": {
+        "ap": 1,
+        "hitOn": 10,
+        "range": 1,
+        "damage": 5
+      }
+    },
+    "skills": [
+      {
+        "id": 1,
+        "name": "Shadow Sweep",
+        "ap": 2,
+        "hitOn": 10,
+        "range": "2 AOE",
+        "card": "/images/card/21_1.png",
+        "description": "ระเบิดไฟระยะ 2 รอบตัว ทำดาเมจ D6 และผลักศัตรู 2 พร้อมติดสถานะ Burn",
+        "effect": []
+      }
+    ]
   }
 ]
