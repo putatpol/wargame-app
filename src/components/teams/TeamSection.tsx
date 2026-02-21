@@ -216,24 +216,36 @@ export default function TeamSection({
                   </div>
                   <div>
                     <p className="text-gray-400">HP</p>
-                    <p className="font-semibold text-red-400">
-                      {currentHp?.[char.id] ?? char.status.hp}
-                      {characterStatBoost[char.id] === "hp" && (
-                        <span className="text-purple-400 ml-1">(+2)</span>
-                      )}
-                      {char.race === "Goliath" && (
-                        <span className="text-orange-400 ml-1">(+3)</span>
-                      )}
-                    </p>
+                    <div className="flex items-center">
+                      <div className="border border-red-500 text-white px-2 py-0.5 rounded-full font-bold flex items-center gap-2">
+                        <span className="text-sm">❤️</span>
+                        <span>
+                          {(currentHp?.[char.id] ?? char.status.hp)}/{char.status.hp}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        {characterStatBoost[char.id] === "hp" && (
+                          <span className="text-purple-400 ml-1">(+2)</span>
+                        )}
+                        {char.race === "Goliath" && (
+                          <span className="text-orange-400 ml-1">(+3)</span>
+                        )}
+                      </div>
+                    </div>
                   </div>
                   <div>
                     <p className="text-gray-400">AP</p>
-                    <p className="font-semibold text-yellow-300">
-                      {currentAp?.[char.id] ?? char.status.ap}
-                    </p>
+                    <div className="flex items-center gap-2">
+                      <div className="border border-amber-400 text-white px-2 py-0.5 rounded-full font-bold flex items-center gap-2">
+                        <span className="text-sm">⚡</span>
+                        <span>
+                          {(currentAp?.[char.id] ?? char.status.ap)}/{char.status.ap}
+                        </span>
+                      </div>
+                    </div>
                   </div>
                   <div>
-                    <p className="text-gray-400">DEF</p>
+                    <p className="text-gray-400">Def / Resist</p>
                     <p className="font-semibold">
                       {getDisplayStat(char.id, "def")} +
                       {characterStatBoost[char.id] === "def" && (
@@ -245,6 +257,7 @@ export default function TeamSection({
                       {char.race === "Dwarf" && (
                         <span className="text-orange-400 ml-1">(-1)</span>
                       )}
+                      <span className="ms-1">/ {getDisplayStat(char.id, "resist")} +</span>
                     </p>
                   </div>
                   <div>

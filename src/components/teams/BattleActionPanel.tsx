@@ -183,7 +183,12 @@ export default function BattleActionPanel({
               <div className="text-xs text-gray-400">
                 Def:{" "}
                 <span className={`${getTeamColorClass(defenderId)} text-xl`}>
-                  {getDisplayStat(defenderId, "def") - (lightCover ? 2 : 0)}+
+                  {(
+                    (selectedSkill
+                      ? getDisplayStat(defenderId, "resist")
+                      : getDisplayStat(defenderId, "def")
+                    ) - (lightCover ? 2 : 0)
+                  )}+
                 </span>
               </div>
             )}

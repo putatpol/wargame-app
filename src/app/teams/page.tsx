@@ -167,6 +167,7 @@ export default function TeamsPage() {
     if (boost === "hp" && statType === "hp") humanBoost = 2;
     if (boost === "def" && statType === "def") humanBoost = -1;
     if (boost === "hiton" && statType === "hiton") humanBoost = -1;
+    if (boost === "resist" && statType === "resist") humanBoost = -1;
 
     const raceBonus = getRaceBonus(characterId, statType);
     return humanBoost + raceBonus;
@@ -179,7 +180,7 @@ export default function TeamsPage() {
     let baseStat = 0;
     if (statType === "hiton") {
       baseStat = character.status.attack.hitOn ?? 0;
-    } else if (statType === "move" || statType === "def" || statType === "hp") {
+    } else if (statType === "move" || statType === "def" || statType === "hp" || statType === "resist") {
       baseStat = character.status[statType] as number;
     }
 

@@ -10,7 +10,7 @@ type StatBoostModalProps = {
   data: StatBoostModalData;
   onApply: (
     characterId: number,
-    statType: "def" | "hp" | "move" | "hiton",
+    statType: "def" | "hp" | "move" | "hiton" | "resist",
   ) => void;
   onClose: () => void;
 };
@@ -53,7 +53,7 @@ export default function StatBoostModal({
             className="w-full bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-3 rounded font-semibold transition text-left"
           >
             <div className="font-bold">Def -1</div>
-            <div className="text-xs text-gray-300">ทอยป้องกันลดลง 1</div>
+            <div className="text-xs text-gray-300">ทอยป้องกันเพิ่มขึ้น 1</div>
           </button>
 
           <button
@@ -61,7 +61,15 @@ export default function StatBoostModal({
             className="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded font-semibold transition text-left"
           >
             <div className="font-bold">Hit On -1</div>
-            <div className="text-xs text-gray-300">ทอยแม่นยำลดลง 1</div>
+            <div className="text-xs text-gray-300">ทอยแม่นยำเพิ่มขึ้น 1</div>
+          </button>
+
+          <button
+            onClick={() => onApply(data.characterId, "resist")}
+            className="w-full bg-purple-600 hover:bg-purple-700 text-white px-4 py-3 rounded font-semibold transition text-left"
+          >
+            <div className="font-bold">Resist +1</div>
+            <div className="text-xs text-gray-300">ทอยต้านทานเพิ่มขึ้น 1</div>
           </button>
         </div>
 

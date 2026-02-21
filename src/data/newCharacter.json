@@ -11,6 +11,7 @@
       "move": 5,
       "hp": 12,
       "def": 15,
+      "resist": 13,
       "attack": {
         "ap": 1,
         "hitOn": 10,
@@ -43,6 +44,7 @@
       "move": 4,
       "hp": 20,
       "def": 8,
+      "resist": 13,
       "attack": {
         "ap": 1,
         "hitOn": 10,
@@ -75,6 +77,7 @@
       "move": 5,
       "hp": 12,
       "def": 15,
+      "resist": 10,
       "attack": {
         "ap": 1,
         "hitOn": 10,
@@ -107,6 +110,7 @@
       "move": 5,
       "hp": 14,
       "def": 15,
+      "resist": 11,
       "attack": {
         "ap": 1,
         "hitOn": 12,
@@ -139,6 +143,7 @@
       "move": 7,
       "hp": 14,
       "def": 12,
+      "resist": 10,
       "attack": {
         "ap": 1,
         "hitOn": 8,
@@ -171,6 +176,7 @@
       "move": 6,
       "hp": 18,
       "def": 12,
+      "resist": 11,
       "attack": {
         "ap": 1,
         "hitOn": 10,

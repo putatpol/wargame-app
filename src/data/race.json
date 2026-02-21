@@ -2,86 +2,103 @@
   {
     "id": 1,
     "name": "Human",
-    "description": "เลือกบวก Status ที่ต้องการได้ 1 อย่างตอนเริ่มเกม"
+    "description": "เลือกบวก Status ที่ต้องการได้ 1 อย่างตอนเริ่มเกม",
+    "resist": 11
   },
   {
     "id": 2,
     "name": "Half-Orc",
-    "description": "หากโดนโจมตีจน HP เหลือ 0 ครั้งแรกของเกม จะเหลือ 1 HP แทน"
+    "description": "หากโดนโจมตีจน HP เหลือ 0 ครั้งแรกของเกม จะเหลือ 1 HP แทน",
+    "resist": 12
   },
   {
     "id": 3,
     "name": "Vampire",
-    "description": "ถ้าฆ่าศัตรูได้ ฟื้นฟู 2 HP"
+    "description": "ถ้าฆ่าศัตรูได้ ฟื้นฟู 2 HP",
+    "resist": 12
   },
   {
     "id": 4,
     "name": "Dragonborn",
-    "description": "เมินดาเมจจากสถานะ"
+    "description": "เมินดาเมจจากสถานะ",
+    "resist": 10
   },
   {
     "id": 5,
     "name": "Tiefling",
-    "description": "เมื่อโดนดาเมจประชิด ศัตรูจะโดนดาเมจไฟ 1 HP คืนทันที"
+    "description": "เมื่อโดนดาเมจประชิด ศัตรูจะโดนดาเมจไฟ 1 HP คืนทันที",
+    "resist": 10
   },
   {
     "id": 6,
     "name": "Dwarf",
-    "description": "HP +2 ถาวร และต้านทานสถานะ [Poison] แต่ M -1"
+    "description": "HP +2 ถาวร และต้านทานสถานะ [Poison] แต่ M -1",
+    "resist": 10
   },
   {
     "id": 7,
     "name": "Goliath",
-    "description": "HP +3 แต่ Def +1 และไม่ถูกผลักกระเด็น"
+    "description": "HP +3 แต่ Def +1 และไม่ถูกผลักกระเด็น",
+    "resist": 12
   },
   {
     "id": 8,
     "name": "Elf",
-    "description": "มีระยะ Move พื้นฐาน +1 และจะไม่ติดโทษจากการเดินในพื้นที่ยากลำบาก"
+    "description": "มีระยะ Move พื้นฐาน +1 และจะไม่ติดโทษจากการเดินในพื้นที่ยากลำบาก",
+    "resist": 9
   },
   {
     "id": 9,
     "name": "Aasimar",
-    "description": "เมื่อจบเทิร์นตัวเอง เพื่อนที่อยู่ติดกัน ฟื้นฟู 1 HP"
+    "description": "เมื่อจบเทิร์นตัวเอง เพื่อนที่อยู่ติดกัน ฟื้นฟู 1 HP",
+    "resist": 9
   },
   {
     "id": 10,
     "name": "Aarakocra",
-    "description": "สามารถเคลื่อนที่ ข้ามสิ่งกีดขวาง หรือยูนิตอื่นได้ (บิน)"
+    "description": "สามารถเคลื่อนที่ ข้ามสิ่งกีดขวาง หรือยูนิตอื่นได้ (บิน)",
+    "resist": 12
   },
   {
     "id": 11,
     "name": "Gnome",
-    "description": "เมื่อต้องทอย Resist ของ debuff จะได้ทอยเต๋า 2 ลูกเลือกค่าสูงสุด"
+    "description": "เมื่อต้องทอย Resist ของ debuff จะได้ทอยเต๋า 2 ลูกเลือกค่าสูงสุด",
+    "resist": 8
   },
   {
     "id": 12,
     "name": "Unknown",
-    "description": "การทอยผลเลขคู่ให้ค่า Hit-1 แต่ถ้าเป็นเลขคี่ค่า Def-1"
+    "description": "การทอยผลเลขคู่ให้ค่า Hit-1 แต่ถ้าเป็นเลขคี่ค่า Def-1",
+    "resist": 13
   },
   {
     "id": 13,
     "name": "Halfling",
-    "description": "หากทอยได้เลข 1 ให้ทอยใหม่ทันที (ต้องใช้ค่าใหม่เสมอ)"
+    "description": "หากทอยได้เลข 1 ให้ทอยใหม่ทันที (ต้องใช้ค่าใหม่เสมอ)",
+    "resist": 11
   },
   {
     "id": 14,
     "name": "Tabaxi",
-    "description": "หากในเทิร์นนั้นใช้ Move อย่างเดียว (ไม่โจมตี) ระยะเดินจะเพิ่มเป็น 2 เท่า"
+    "description": "หากในเทิร์นนั้นใช้ Move อย่างเดียว (ไม่โจมตี) ระยะเดินจะเพิ่มเป็น 2 เท่า",
+    "resist": 11
   },
   {
     "id": 15,
     "name": "Lizardfolk",
-    "description": "มีค่า Def Target -1 เสมอ"
+    "description": "มีค่า Def Target -1 เสมอ",
+    "resist": 12
   },
   {
     "id": 16,
     "name": "Warforged",
-    "description": "ไม่ติดสถานะ [Bleed] และไม่ต้องใช้ AP ในการลุกขึ้นยืนเมื่อติด [Prone]"
+    "description": "ไม่ติดสถานะ [Bleed] และไม่ต้องใช้ AP ในการลุกขึ้นยืนเมื่อติด [Prone]",
+    "resist": 10
   },
   {
     "id": 17,
     "name": "Dryad",
-    "description": "ฟื้น HP 2 หน่วยถ้าไม่ขยับ แต่แพ้ทางไฟ +2 Dmg"
+    "description": "ฟื้น HP 2 หน่วยถ้าไม่ขยับ แต่แพ้ทางไฟ +2 Dmg",
+    "resist": 10
   }
 ]
