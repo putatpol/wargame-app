@@ -36,6 +36,7 @@ export interface Character {
     move: number;
     hp: number;
     def: number;
+    resist: number;
     attack: Attack;
   };
   skills: Skill[];

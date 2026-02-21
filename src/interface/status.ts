@@ -7,7 +7,7 @@ export interface StatusBuff {
   image: string;
   effect: 
     {
-      stat: "hitOn" | "atk" | "def" | "move" | "ap"| "hp" | "skill";
+      stat: "hitOn" | "atk" | "def" | "move" | "ap"| "hp" | "skill" | "resist";
       value: number;
     }[];
   resist: {

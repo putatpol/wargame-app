@@ -44,11 +44,11 @@ interface TeamContextType {
   resetTurn: () => void;
   turnNumber: number;
   characterStatBoost: {
-    [characterId: number]: "move" | "hp" | "def" | "hiton" | null;
+    [characterId: number]: "move" | "hp" | "def" | "hiton" | "resist" | null;
   };
   applyStatBoost: (
     characterId: number,
-    stat: "move" | "hp" | "def" | "hiton",
+    stat: "move" | "hp" | "def" | "hiton" | "resist",
   ) => void;
   // now each active status entry can include remaining turns
   activeStatusBuffs: { [characterId: number]: { id: number; remaining?: number | null }[] };
@@ -90,7 +90,7 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
   );
   const [turnNumber, setTurnNumber] = useState<number>(1);
   const [characterStatBoost, setCharacterStatBoost] = useState<{
-    [characterId: number]: "move" | "hp" | "def" | "hiton" | null;
+    [characterId: number]: "move" | "hp" | "def" | "hiton" | "resist" | null;
   }>({});
   // activeStatusBuffs now tracks objects so we can store remaining turns
   type ActiveBuffEntry = { id: number; remaining?: number | null };
@@ -412,7 +412,7 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
 
   const applyStatBoost = (
     characterId: number,
-    stat: "move" | "hp" | "def" | "hiton",
+    stat: "move" | "hp" | "def" | "hiton" | "resist",
   ) => {
     const character = (characterData as Character[]).find(
       (c) => c.id === characterId,
@@ -450,6 +450,7 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
       hp: "HP +2",
       def: "Def -1",
       hiton: "Hit On -1",
+      resist: "Resist -1",
     };
 
     addNotification(
